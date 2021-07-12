@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Settings页面</h1>
+        <h1>我的页面</h1>
     </div>
 </template>
 <script></script>

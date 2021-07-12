@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 const orginPush = VueRouter.prototype.push;
-VueRouter.prototype.push = function(location){
+VueRouter.prototype.push = function (location) {
   return orginPush.call(this, location).catch(error => error);
 }
 const routes = [
@@ -22,9 +22,14 @@ const routes = [
     component: () => import("../views/Charts.vue")
   },
   {
-    path: '/settings',
-    name: 'settings',
-    component: () => import("../views/Settings.vue")
+    path: '/news',
+    name: 'news',
+    component: () => import("../views/News.vue")
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import("../views/Profile.vue")
   }
 ]
 
