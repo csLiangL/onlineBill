@@ -1,5 +1,5 @@
 <template>
-    <div class="tab-bar">
+    <div id="tab-bar">
         <tab-bar-item path='/home'>
             <img slot="item-icon" src="~assets/img/home.svg" alt="">
             <img slot="item-icon-active" src="~assets/img/home-active.svg" alt="">
@@ -31,7 +31,7 @@
     }
 </script>
 <style>
-    .tab-bar {
+    #tab-bar {
         display: flex;
         justify-content: space-around;
         position: fixed;
