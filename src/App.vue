@@ -1,7 +1,10 @@
 <template>
   <div id="app">
 
-    <router-view />
+    <!-- 被激活的路由将显示在这里 -->
+    <keep-alive>
+      <router-view />
+    </keep-alive>
   </div>
 </template>
 

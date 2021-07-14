@@ -1,13 +1,13 @@
 <template>
-    <div>
-        <div class="tab-bar-item" @click="itemClickHandle">
-            <slot v-if="!isActive" name="item-icon"></slot>
-            <slot v-else name="item-icon-active"></slot>
-            <div :style="activeStyle">
-                <slot name="item-text"></slot>
-            </div>
+
+    <div class="tab-bar-item" @click="itemClickHandle">
+        <slot v-if="!isActive" name="item-icon"></slot>
+        <slot v-else name="item-icon-active"></slot>
+        <div :style="activeStyle">
+            <slot name="item-text"></slot>
         </div>
     </div>
+
 </template>
 <script>
     export default {
@@ -46,8 +46,10 @@
     }
 </script>
 <style>
+    /* 子项flex=1，则相邻子项间没有缝隙 */
     .tab-bar-item {
         display: flex;
+        flex: 1;
         flex-direction: column;
         align-items: center;
         font-size: 12px;

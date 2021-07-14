@@ -33,7 +33,6 @@
 <style>
     #tab-bar {
         display: flex;
-        justify-content: space-around;
         position: fixed;
         bottom: 0;
         left: 0;
