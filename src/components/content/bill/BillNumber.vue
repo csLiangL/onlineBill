@@ -1,10 +1,9 @@
 <template>
     <div class="bill-number">
         <input type="text" :value="valueShow" :style="{borderBottomWidth: borderBottomWidth}"
-            @click=" inputClickHandler">
+            @click="inputClickHandler">
         <van-number-keyboard :show="numBarShow" theme="custom" extra-key="." close-button-text="完成" @blur="blurHandler"
             @delete="onDelete" @input="onInput" />
-
     </div>
 </template>
 <script>

@@ -1,5 +1,5 @@
 <template>
-    <div class="bill-bar-item" :style="{backgroundColor: backgroundColor}" @click="itemClickHandler">
+    <div class="bill-bar-item" :style="backgroundColor" @click="itemClickHandler">
         <div class="name">
             <slot name="icon"></slot>
             <slot name="name"></slot>
@@ -12,14 +12,29 @@
 
 <script>
     export default {
+        props: {
+            idx: {
+                type: Number,
+                default: ""
+            },
+            currentClicked: {
+                type: Number,
+                default: ""
+            }
+        },
         data() {
             return {
-                backgroundColor: "#fff"
+                data_idx: this.idx,
+            }
+        },
+        computed: {
+            backgroundColor() {
+                return this.data_idx == this.currentClicked ? { backgroundColor: "#f6f6f6" } : { backgroundColor: "#fff" }
             }
         },
         methods: {
             itemClickHandler() {
-                this.backgroundColor = "#f6f6f6";
+                this.$emit("itemClick", this.data_idx);
             }
         }
     }
@@ -61,10 +76,10 @@
         font-size: 14px;
     }
 
-    .bill-bar-item .text input {
-        padding: 0;
-        border: 0;
+    .bill-bar-item .text span {
+        display: inline-block;
         width: 100%;
+        height: inherit;
         font-size: 16px;
         background-color: transparent;
     }
