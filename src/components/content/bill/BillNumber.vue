@@ -29,6 +29,7 @@
             inputClickHandler() {
                 this.numBarShow = true;
                 this.borderBottomWidth = "2px";
+                this.$emit("billNumClick");
             },
             blurHandler() {
                 this.numBarShow = false;
