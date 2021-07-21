@@ -14,7 +14,7 @@
                 // 操作的是value
                 value: "",
                 numBarShow: true,
-                borderBottomWidth: "1px",
+                borderBottomWidth: "2px",
             }
         },
         computed: {
@@ -91,6 +91,5 @@
         color: #04BE02;
         caret-color: transparent;
         border-bottom: 1px solid #04BE02;
-        box-sizing: border-box;
     }
 </style>
