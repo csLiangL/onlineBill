@@ -46,13 +46,14 @@
         content: url("~assets/img/return-active.svg");
     }
 
-    .nav-bar img {
+    .nav-bar div img {
         height: 22px;
         vertical-align: middle;
     }
 
+
     .nav-bar .center {
-        flex: 6;
+        flex: 5;
         /* background-color: red; */
     }
 </style>

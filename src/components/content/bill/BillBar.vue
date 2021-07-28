@@ -1,35 +1,30 @@
 <template>
     <div class="bill-bar">
-        <!-- <bill-number @billNumClick="billNumClickHandler"></bill-number> -->
+
         <div class="bill-bar-number">
-            <!-- <input type="text" :value="numShow" :style="{borderBottomWidth: borderBottomWidth}" -->
-            <input type="text" :value="numShow" :style="NumBoxBorderStyle" @click="inputClickHandler">
+            <input type="text" :value="numShow" :style="[NumBoxColorStyle, NumBoxBorderStyle]"
+                @click="inputClickHandler">
         </div>
 
-        <!-- 方式二：在billbaritem.vue组件中显示弹出的组件-->
-        <!-- <bill-bar-item :idx="1" :currentClicked="currClicked" @itemClick="itemClickHandler" @getData="getDataHandler"> -->
         <bill-bar-item :idx="1" :currentClicked="currClicked" @itemClick="itemClickHandler">
             <img slot="icon" src="~assets/img/class.svg">
             <span slot="name">分类</span>
             <span slot="text">{{this.category}}</span>
         </bill-bar-item>
-        <!-- <bill-bar-item :idx="2" :currentClicked="currClicked" @itemClick="itemClickHandler" @getData="getDataHandler"> -->
         <bill-bar-item :idx="2" :currentClicked="currClicked" @itemClick="itemClickHandler">
             <img slot="icon" src="~assets/img/account.svg">
             <span slot="name">账户</span>
             <span slot="text">{{this.account}}</span>
         </bill-bar-item>
-        <!-- <bill-bar-item :idx="3" :currentClicked="currClicked" @itemClick="itemClickHandler" @getData="getDataHandler"> -->
         <bill-bar-item :idx="3" :currentClicked="currClicked" @itemClick="itemClickHandler">
             <img slot="icon" src="~assets/img/time.svg">
             <span slot="name">时间</span>
             <span slot="text">{{this.timeShow}}</span>
         </bill-bar-item>
-        <!-- <bill-bar-item :idx="4" :currentClicked="currClicked" @itemClick="itemClickHandler" @getData="getDataHandler"> -->
         <bill-bar-item :idx="4" :currentClicked="currClicked" @itemClick="itemClickHandler">
             <img slot="icon" src="~assets/img/note.svg">
             <span slot="name">备注</span>
-            <input slot="text" type="text" v-model="note"></input>
+            <input slot="text" type="text" v-model="note" placeholder="..."></input>
         </bill-bar-item>
 
         <div class="bill-bar-pop">
@@ -52,6 +47,7 @@
                 <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
             </van-datetime-picker>
         </div>
+
     </div>
 </template>
 
@@ -59,7 +55,6 @@
     import { NumberKeyboard, Picker, DatetimePicker } from 'vant';
 
     import BillBarItem from "components/content/bill/BillBarItem.vue"
-    // import BillNumber from "components/content/bill/BillNumber.vue"
 
     export default {
         props: {
@@ -70,19 +65,19 @@
         },
         data() {
             return {
-                // currentDate: new Date(),
+
                 currClicked: 0,
 
                 num: "",
                 category: "",
                 account: "",
                 time: new Date(),
-                note: "...",
+                note: "",
 
                 // 数字键盘相关数据
                 numIdx: 0,
 
-                // 级联数据
+                // 类别级联数据
                 catCols: [
                     {
                         text: "吃",
@@ -97,6 +92,7 @@
                         children: [{ text: "衣服" }, { text: "裤子" }, { text: "鞋子" }]
                     },
                 ],
+                // 账户级联数据
                 accountCols: [
                     {
                         text: "电子账户",
@@ -119,12 +115,10 @@
             }
         },
         created() {
-            // this.account = "现金 > 美元";
             this.category = this.catCols[0].text + " > " + this.catCols[0].children[0].text;
             this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
         },
         components: {
-            // BillNumber,
             [NumberKeyboard.name]: NumberKeyboard,
             [Picker.name]: Picker,
             [DatetimePicker.name]: DatetimePicker,
@@ -138,6 +132,9 @@
             },
             numShow() {
                 return this.num == "" ? "0.00" : parseFloat(this.num).toFixed(2);
+            },
+            NumBoxColorStyle() {
+                return { "color": this.color, "borderBottomColor": this.color }
             },
             NumBoxBorderStyle() {
                 return this.currClicked == this.numIdx ? { "borderBottomWidth": "2px" } : { "borderBottomWidth": "1px" }
@@ -164,10 +161,6 @@
                     this.time.getDate() + "日 " + hours + ":" + minutes;
             },
 
-            // 备注相关数据处理
-            // inputHandler() {
-            //     this.note += event.data
-            // }
 
         },
         methods: {
@@ -223,7 +216,7 @@
             },
             onDelete() {
                 if (this.num[this.num.length - 1] == ".") {
-                    this.value = this.value.slice(0, this.value.length - 2)
+                    this.num = this.num.slice(0, this.num.length - 2)
                 } else {
                     this.num = this.num.slice(0, this.num.length - 1);
                 }
@@ -291,9 +284,10 @@
         border: 0 transparent;
         width: 100%;
         font-size: 40px;
-        color: #04BE02;
+        /* color: #04BE02; */
         caret-color: transparent;
-        border-bottom: 1px solid #04BE02;
+        /* border-bottom: 1px solid #04BE02; */
+        border-bottom-style: solid;
     }
 
     .bill-bar-pop {

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="home">
         <swiper>
             <swiper-item v-for="item in banners">
                 <a :href="item.link">
@@ -7,12 +7,32 @@
                 </a>
             </swiper-item>
         </swiper>
+
         <button @click="btnClickHandler">去记账</button>
+
+
+        <div class="record">
+            <div class="date">
+                <span class="bigger">26日</span>
+                <span class="grey">7.2021 周一</span>
+            </div>
+            <div class="item">
+                <div class="item-icon">
+                    <img src="~assets/img/edit.svg" alt="">
+                    <div class="icon-note">
+                        <span class="">吃饭</span>
+                        <span class="grey">13:09 现金</span>
+                    </div>
+                </div>
+                <div class="item-num">30.00</div>
+            </div>
+        </div>
         <tab-bar></tab-bar>
     </div>
 </template>
 <script>
     import TabBar from "components/common/tab/TabBar.vue"
+    import BillBarItem from "components/content/bill/BillNumber.vue"
     import { Swiper, SwiperItem } from "components/common/swiper/index.js"
     export default {
         data() {
@@ -35,14 +55,21 @@
                         img: "http://img.b2bname.com/archive201912/15775138381381.jpg"
                     }
                 ],
+                // bills: [
+                //     {
+                //         time: 
+                //     }
+                // ]
             }
         },
         components: {
             TabBar,
             Swiper,
-            SwiperItem
+            SwiperItem,
+            BillBarItem
         },
         methods: {
+            // "去记账"按钮
             btnClickHandler() {
                 this.$router.push("/bill")
             }
@@ -50,3 +77,29 @@
     }
 
 </script>
+
+<style>
+    .date {
+        height: 20px;
+    }
+
+    .item {
+        display: flex;
+        height: 50px;
+        line-height: 50px;
+        justify-content: space-between;
+    }
+
+    .item .item-icon {
+        display: flex;
+    }
+
+    .item .item-icon img {
+        width: 20px;
+    }
+
+    .item .item-icon .icon-note {
+        display: flex;
+        flex-flow: column nowrap;
+    }
+</style>
