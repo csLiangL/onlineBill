@@ -62,6 +62,10 @@ const routes = [
     component: Bill,
     children: [
       {
+        path: "",
+        redirect: "/bill/billout"
+      },
+      {
         path: "billin",
         // component: () => import("views/BillIn")
         component: BillIn
@@ -77,7 +81,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
   base: process.env.BASE_URL,
   routes
 })

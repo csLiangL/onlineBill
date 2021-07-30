@@ -1,9 +1,6 @@
 <template>
     <div>
         <h1>Charts页面</h1>
-        <router-link to="/charts/line">line</router-link>
-        <router-link to="/charts/pie">pie</router-link>
-        <router-view />
         <tab-bar></tab-bar>
     </div>
 </template>

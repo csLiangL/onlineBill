@@ -212,7 +212,7 @@
 
 <style scoped>
   #hy-swiper {
-    height: 200px;
+    height: 150px;
     overflow: hidden;
     position: relative;
   }

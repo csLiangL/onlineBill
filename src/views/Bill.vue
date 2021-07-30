@@ -7,12 +7,11 @@
                 <img slot="right" src="~assets/img/submit.svg">
             </div>
         </nav-bar>
-        <!-- <span @click='billoutHandle'>支出</span>
-        <span @click='billoutHandle1'>收入</span> -->
-        <router-link to="/bill/billout">支出</router-link>
-        <router-link to="/bill/billin">收入</router-link>
+        <div class="outIn">
+            <span class="out" @click="billoutClickHandle" :class="{'active': outActive}">支出</span>
+            <span class="in" @click="billInClickHandle" :class="{'active': inActive}">收入</span>
+        </div>
         <router-view />
-        <!-- <bill-bar></bill-bar> -->
     </div>
 </template>
 
@@ -20,20 +19,59 @@
     import NavBar from "components/common/nav/NavBar.vue"
     import BillBar from "components/content/bill/BillBar.vue"
     export default {
+        data() {
+            return {
+                path: "/bill/billout"
+            }
+        },
+
         name: "bill",
         components: {
             NavBar,
             BillBar
         },
-        // methods: {
-        //     billoutHandle() {
-        //         console.log('2')
-        //         this.$router.push({ path: '/bill/billin' })
-        //     },
-        //     billoutHandle1() {
-        //         console.log('1')
-        //         this.$router.push({ path: '/bill/billout' })
-        //     }
-        // }
+        computed: {
+            outActive() {
+                return this.path == "/bill/billout";
+            },
+            inActive() {
+                return this.path == "/bill/billin";
+            }
+        },
+        methods: {
+            billoutClickHandle() {
+                this.$router.push({ path: '/bill/billout' });
+                this.path = "/bill/billout";
+            },
+            billInClickHandle() {
+                this.$router.push({ path: '/bill/billin' })
+                this.path = "/bill/billin";
+
+            }
+        }
     }
 </script>
+
+<style>
+    .outIn {
+        display: flex;
+        justify-content: space-around;
+        height: 25px;
+        line-height: 25px;
+        font-size: 14px;
+        box-shadow: 0 1px 0px 1px rgba(0, 0, 0, .08);
+        background-color: #f6f6f6;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+    }
+
+    .outIn .in,
+    .outIn .out {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+
+    .active {
+        color: #DAA520;
+    }
+</style>

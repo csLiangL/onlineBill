@@ -276,7 +276,7 @@
     .bill-bar-number {
         height: 80px;
         line-height: 80px;
-        margin: 30px 0 30px 30px;
+        margin: 0px 0 30px 30px;
     }
 
     .bill-bar-number input {
