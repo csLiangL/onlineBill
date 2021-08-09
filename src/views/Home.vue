@@ -23,140 +23,31 @@
         <div id="tobill" @click="btnClickHandler">记一笔</div>
 
 
-        <div class=" record">
+
+        <div class="record" v-for="(bill, bidx) in bills">
             <div class="date">
                 <span class="bigger">26日 </span>
                 <span class="grey">7.2021 周一</span>
             </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
+            <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists">
+                <div class="item">
+                    <div class="item-icon">
+                        <img src="~assets/img/edit.svg" alt="">
+                    </div>
+                    <div class="item-note">
+                        <span class="bigger">{{item.category}}</span>
+                        <br>
+                        <span class="grey">{{item.note}}</span>
+                        <span class="grey">13:09 {{item.account}}</span>
+                    </div>
+                    <div class="item-num">
+                        <span>{{item.num}}</span>
+                    </div>
                 </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-        </div>
-        <div class="record">
-            <div class="date">
-                <span class="bigger">26日 </span>
-                <span class="grey">7.2021 周一</span>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-        </div>
-        <div class="record">
-            <div class="date">
-                <span class="bigger">26日 </span>
-                <span class="grey">7.2021 周一</span>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
-            <div class="item">
-                <div class="item-icon">
-                    <img src="~assets/img/edit.svg" alt="">
-                </div>
-                <div class="item-note">
-                    <span class="bigger">吃饭</span>
-                    <br>
-                    <span class="grey">13:09 现金</span>
-                </div>
-                <div class="item-num">
-                    <span>30.00</span>
-                </div>
-            </div>
+                <template #right>
+                    <button class="delbtn" @click="delClickHandler(bidx, iidx)">删 除</button>
+                </template>
+            </van-swipe-cell>
         </div>
         <tab-bar></tab-bar>
     </div>
@@ -165,6 +56,8 @@
     import TabBar from "components/common/tab/TabBar.vue"
     import BillBarItem from "components/content/bill/BillNumber.vue"
     import { Swiper, SwiperItem } from "components/common/swiper/index.js"
+    import { SwipeCell, Dialog } from "vant"
+
     export default {
         data() {
             return {
@@ -186,23 +79,80 @@
                         img: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fenc.gaosouyi.com%2Fueditor%2Fphp%2Fupload%2Fimage%2F20150130%2F1422603989279511.jpg&refer=http%3A%2F%2Fenc.gaosouyi.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630244705&t=3fbdcba1174ffbf9d7df5ba4f0e542f2"
                     }
                 ],
-                // bills: [
-                //     {
-                //         time: 
-                //     }
-                // ]
+                bills: [
+                    {
+                        time: "2021/8/8",
+                        lists: [
+                            {
+                                idx: 1,
+                                num: 8.5,
+                                category: "吃饭",
+                                account: "现金",
+                                time: "2021/8/8 13:09",
+                                note: "",
+                            },
+                            {
+                                idx: 2,
+                                num: 18.3,
+                                category: "吃饭",
+                                account: "现金",
+                                time: "2021/8/8 13:09",
+                                note: "今天吃了一大碗发了大家夫拉进来发就奥利弗"
+                            },
+                        ]
+                    },
+                    {
+                        time: "2021/8/5",
+                        lists: [
+                            {
+                                idx: 3,
+                                num: 8.5,
+                                category: "吃饭",
+                                account: "现金",
+                                time: "2021/8/8 13:09",
+                                note: "",
+                            },
+                        ]
+                    }
+                ]
             }
         },
         components: {
             TabBar,
             Swiper,
             SwiperItem,
-            BillBarItem
+            BillBarItem,
+            [SwipeCell.name]: SwipeCell,
+            [Dialog.name]: Dialog,
+        },
+
+        computed: {
+            // 获得day
+            // 获得时分，星期
         },
         methods: {
             // "去记账"按钮
             btnClickHandler() {
                 this.$router.push("/bill")
+            },
+
+            // 关闭滑动前：记录点击位置，若是点击了删除，则弹出弹窗。
+            // position 为关闭时点击的位置
+            // instance 为对应的 SwipeCell 实例
+            delClickHandler(bidx, iidx) {
+                this.$dialog.confirm({
+                    message: '确定删除该笔账单吗？',
+                }).then((confirm) => {          // 点击确认
+                    // 1.删除本地的数据
+                    this.bills[bidx].lists.splice(iidx, 1);
+                    if (this.bills[bidx].lists.length == 0) {
+                        this.bills.splice(bidx, 1)
+                    }
+                    // 2.删除数据库中的数据
+                    console.log(this.bills)
+                }).catch((cancel) => {         // 点击取消
+                    console.log(cancel)
+                });
             }
         }
     }
@@ -279,11 +229,11 @@
     }
 
     .item .item-note {
-        flex: 2;
+        flex: 5;
     }
 
     .item .item-num {
-        flex: 5;
+        flex: 1;
         color: #04BE02;
         margin-right: 10px;
     }
@@ -304,5 +254,16 @@
     .grey {
         font-size: 12px;
         color: #aaaaaa;
+    }
+
+    .delbtn {
+        height: 100%;
+        width: 100%;
+        border: 0;
+        background-color: #ff3300;
+        border-radius: 8px;
+        color: #eee;
+        font-size: 14px;
+        padding: 0 10px;
     }
 </style>
