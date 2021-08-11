@@ -22,15 +22,13 @@
 
         <div id="tobill" @click="btnClickHandler">记一笔</div>
 
-
-
         <div class="record" v-for="(bill, bidx) in bills">
             <div class="date">
                 <span class="bigger">26日 </span>
                 <span class="grey">7.2021 周一</span>
             </div>
             <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists">
-                <div class="item">
+                <div class="item" @click="billClickHander(item)">
                     <div class="item-icon">
                         <img src="~assets/img/edit.svg" alt="">
                     </div>
@@ -41,7 +39,7 @@
                         <span class="grey">13:09 {{item.account}}</span>
                     </div>
                     <div class="item-num">
-                        <span>{{item.num}}</span>
+                        <span :class="{'inColor':!item.isOut}">{{item.num}}</span>
                     </div>
                 </div>
                 <template #right>
@@ -90,6 +88,7 @@
                                 account: "现金",
                                 time: "2021/8/8 13:09",
                                 note: "",
+                                isOut: true,
                             },
                             {
                                 idx: 2,
@@ -97,7 +96,8 @@
                                 category: "吃饭",
                                 account: "现金",
                                 time: "2021/8/8 13:09",
-                                note: "今天吃了一大碗发了大家夫拉进来发就奥利弗"
+                                note: "今天吃了一大碗发了大家夫拉进来发就奥利弗",
+                                isOut: true,
                             },
                         ]
                     },
@@ -111,6 +111,16 @@
                                 account: "现金",
                                 time: "2021/8/8 13:09",
                                 note: "",
+                                isOut: true,
+                            },
+                            {
+                                idx: 4,
+                                num: 1000,
+                                category: "工资",
+                                account: "现金",
+                                time: "2021/8/8 13:09",
+                                note: "今天赚了1000元",
+                                isOut: false,
                             },
                         ]
                     }
@@ -133,7 +143,7 @@
         methods: {
             // "去记账"按钮
             btnClickHandler() {
-                this.$router.push("/bill")
+                this.$router.push("/billing")
             },
 
             // 关闭滑动前：记录点击位置，若是点击了删除，则弹出弹窗。
@@ -153,6 +163,11 @@
                 }).catch((cancel) => {         // 点击取消
                     console.log(cancel)
                 });
+            },
+
+            billClickHander(item) {
+                this.$store.state.currEdit = item;
+                this.$router.push("/editing")
             }
         }
     }
@@ -265,5 +280,9 @@
         color: #eee;
         font-size: 14px;
         padding: 0 10px;
+    }
+
+    .inColor {
+        color: red
     }
 </style>
