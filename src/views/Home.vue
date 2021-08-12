@@ -20,12 +20,10 @@
 
         </div>
 
-        <div id="tobill" @click="btnClickHandler">记一笔</div>
-
         <div class="record" v-for="(bill, bidx) in bills">
             <div class="date">
-                <span class="bigger">26日 </span>
-                <span class="grey">7.2021 周一</span>
+                <span class="bigger">{{getDate(bill.date)}} </span>
+                <span class="grey">{{getYearMonth(bill.date)}}</span>
             </div>
             <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists">
                 <div class="item" @click="billClickHander(item)">
@@ -33,13 +31,12 @@
                         <img src="~assets/img/edit.svg" alt="">
                     </div>
                     <div class="item-note">
-                        <span class="bigger">{{item.category}}</span>
-                        <br>
-                        <span class="grey">{{item.note}}</span>
-                        <span class="grey">13:09 {{item.account}}</span>
+                        <div class="bigger">{{item.category.split(" ")[2]}}</div>
+                        <div class="grey">{{item.note}}</div>
+                        <div class="grey">13:09 {{item.account.split(" ")[2]}}</div>
                     </div>
                     <div class="item-num">
-                        <span :class="{'inColor':!item.isOut}">{{item.num}}</span>
+                        <span :class="{'inColor':!item.isOut}">{{parseFloat(item.num).toFixed(2)}}</span>
                     </div>
                 </div>
                 <template #right>
@@ -47,7 +44,13 @@
                 </template>
             </van-swipe-cell>
         </div>
+        <div id="tobill" @click.prevent="btnClickHandler">记一笔</div>
         <tab-bar></tab-bar>
+
+        <!-- 消息的展示 -->
+        <div v-if="this.$store.state.msg" class="alert">
+            <span>{{this.$store.state.msg}}</span>
+        </div>
     </div>
 </template>
 <script>
@@ -55,6 +58,7 @@
     import BillBarItem from "components/content/bill/BillNumber.vue"
     import { Swiper, SwiperItem } from "components/common/swiper/index.js"
     import { SwipeCell, Dialog } from "vant"
+    import { getBills } from "../network/request.js"
 
     export default {
         data() {
@@ -77,54 +81,79 @@
                         img: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fenc.gaosouyi.com%2Fueditor%2Fphp%2Fupload%2Fimage%2F20150130%2F1422603989279511.jpg&refer=http%3A%2F%2Fenc.gaosouyi.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630244705&t=3fbdcba1174ffbf9d7df5ba4f0e542f2"
                     }
                 ],
-                bills: [
-                    {
-                        time: "2021/8/8",
-                        lists: [
-                            {
-                                idx: 1,
-                                num: 8.5,
-                                category: "吃饭",
-                                account: "现金",
-                                time: "2021/8/8 13:09",
-                                note: "",
-                                isOut: true,
-                            },
-                            {
-                                idx: 2,
-                                num: 18.3,
-                                category: "吃饭",
-                                account: "现金",
-                                time: "2021/8/8 13:09",
-                                note: "今天吃了一大碗发了大家夫拉进来发就奥利弗",
-                                isOut: true,
-                            },
-                        ]
-                    },
-                    {
-                        time: "2021/8/5",
-                        lists: [
-                            {
-                                idx: 3,
-                                num: 8.5,
-                                category: "吃饭",
-                                account: "现金",
-                                time: "2021/8/8 13:09",
-                                note: "",
-                                isOut: true,
-                            },
-                            {
-                                idx: 4,
-                                num: 1000,
-                                category: "工资",
-                                account: "现金",
-                                time: "2021/8/8 13:09",
-                                note: "今天赚了1000元",
-                                isOut: false,
-                            },
-                        ]
-                    }
-                ]
+                bills: "",
+                // bills: [
+                //     {
+                //         date: "2021年8月10日",
+                //         lists: [
+                //             {
+                //                 idx: 1,
+                //                 num: 8.50,
+                //                 category: "食 > 吃饭",
+                //                 account: "现金 > 人民币",
+                //                 time: "2021年8月8日 13:09",
+                //                 note: "吃了一顿饭",
+                //                 isOut: true,
+                //             },
+                //             {
+                //                 idx: 1,
+                //                 num: 8.50,
+                //                 category: "食 > 吃饭",
+                //                 account: "现金 > 人民币",
+                //                 time: "2021/8/8 13:09",
+                //                 note: "",
+                //                 isOut: true,
+                //             },
+                //         ]
+                //     },
+                //     {
+                //         date: "2021年8月7日",
+                //         lists: [
+                //             {
+                //                 idx: 1,
+                //                 num: 8.50,
+                //                 category: "食 > 吃饭",
+                //                 account: "现金 > 人民币",
+                //                 time: "2021年8月8日 13:09",
+                //                 note: "",
+                //                 isOut: true,
+                //             },
+                //             {
+                //                 idx: 1,
+                //                 num: 8.50,
+                //                 category: "食 > 吃饭",
+                //                 account: "现金 > 人民币",
+                //                 time: "2021/8/8 13:09",
+                //                 note: "",
+                //                 isOut: true,
+                //             },
+                //         ]
+                //     },
+                //     {
+                //         date: "2021年8月2日",
+                //         lists: [
+                //             {
+                //                 idx: 1,
+                //                 num: 8.50,
+                //                 category: "食 > 吃饭",
+                //                 account: "现金 > 人民币",
+                //                 time: "2021年8月8日 13:09",
+                //                 note: "",
+                //                 isOut: true,
+                //             },
+                //             {
+                //                 idx: 1,
+                //                 num: 8.50,
+                //                 category: "食 > 吃饭",
+                //                 account: "现金 > 人民币",
+                //                 time: "2021/8/8 13:09",
+                //                 note: "",
+                //                 isOut: true,
+                //             },
+                //         ]
+                //     },
+
+                // ]
             }
         },
         components: {
@@ -136,11 +165,63 @@
             [Dialog.name]: Dialog,
         },
 
+        created() {
+            // 获得首页数据
+            getBills({
+                url: "/getBills",
+                params: {
+                    userid: "1"
+                }
+            }).then(res => {
+                this.bills = res;
+                console.log("home:", this.bills)
+            })
+        },
+
         computed: {
-            // 获得day
-            // 获得时分，星期
+            // 获得日
+            getDate() {
+                return date => date.split("月")[1];
+            },
+
+            // 获得年月，星期
+            getYearMonth() {
+                return date => {
+                    let year = date.split("年")[0]
+                    let month = parseInt(date.split("年")[1].split("月")[0]) - 1;
+                    let dt = this.getDate(date).split("日")[0];
+                    let day = new Date(year, month, dt).getDay();
+                    switch (day) {
+                        case 1:
+                            day = "一";
+                            break;
+                        case 2:
+                            day = "二";
+                            break;
+                        case 3:
+                            day = "三";
+                            break;
+                        case 4:
+                            day = "四";
+                            break;
+                        case 5:
+                            day = "五";
+                            break;
+                        case 6:
+                            day = "六";
+                            break;
+                        case 7:
+                            day = "日";
+                            break;
+                    }
+
+                    return (month + 1) + "." + year + " 周" + day;
+                }
+            }
+
         },
         methods: {
+
             // "去记账"按钮
             btnClickHandler() {
                 this.$router.push("/billing")
@@ -234,7 +315,7 @@
         display: flex;
         align-items: center;
         justify-items: center;
-        padding: 10px 0;
+        padding: 8px 0;
         border-bottom: 1px solid #f6f6f6;
     }
 
@@ -248,7 +329,7 @@
     }
 
     .item .item-num {
-        flex: 1;
+        flex: 2;
         color: #04BE02;
         margin-right: 10px;
     }
@@ -263,12 +344,20 @@
 
     .bigger {
         font-size: 16px;
-        font-weight: 500;
+        font-weight: 700;
     }
 
     .grey {
         font-size: 12px;
         color: #aaaaaa;
+    }
+
+    .item-note .bigger {
+        padding: 2px;
+    }
+
+    .item-note .grey {
+        padding: 3px;
     }
 
     .delbtn {
@@ -284,5 +373,18 @@
 
     .inColor {
         color: red
+    }
+
+    .alert {
+        position: fixed;
+        bottom: 50%;
+        width: 100%;
+        text-align: center;
+    }
+
+    .alert span {
+        padding: 5px;
+        background-color: #222;
+        color: #fff;
     }
 </style>

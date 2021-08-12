@@ -1,37 +1,63 @@
 <template>
     <div class="bill-bar">
 
+
+        <!-- 金额 -->
         <div class="bill-bar-number">
-            <input type="text" :value="numShow" :style="[NumBoxColorStyle, NumBoxBorderStyle]"
-                @click="inputClickHandler">
+            <input type="text" :value="numShow" :class="[{'outStyle': isOut}, {'inStyle': !isOut}]"
+                :style="NumBoxClickBorderStyle" @click="itemClickHandler(0)">
         </div>
 
-        <bill-bar-item :idx="1" :currentClicked="currClicked" @itemClick="itemClickHandler">
-            <img slot="icon" src="~assets/img/class.svg">
-            <span slot="name">分类</span>
-            <span slot="text">{{this.category}}</span>
-        </bill-bar-item>
-        <bill-bar-item :idx="2" :currentClicked="currClicked" @itemClick="itemClickHandler">
-            <img slot="icon" src="~assets/img/account.svg">
-            <span slot="name">账户</span>
-            <span slot="text">{{this.account}}</span>
-        </bill-bar-item>
-        <bill-bar-item :idx="3" :currentClicked="currClicked" @itemClick="itemClickHandler">
-            <img slot="icon" src="~assets/img/time.svg">
-            <span slot="name">时间</span>
-            <span slot="text">{{this.timeShow}}</span>
-        </bill-bar-item>
-        <bill-bar-item :idx="4" :currentClicked="currClicked" @itemClick="itemClickHandler">
-            <img slot="icon" src="~assets/img/note.svg">
-            <span slot="name">备注</span>
-            <input slot="text" type="text" v-model="note" placeholder="..."></input>
-        </bill-bar-item>
+        <!-- 分类 -->
+        <div class="bill-bar-item" @click="itemClickHandler(1)">
+            <div class="name">
+                <img src="~assets/img/class.svg">
+                <span>分类</span>
+            </div>
+            <div class="text">
+                <span>{{this.category}}</span>
+            </div>
+        </div>
+
+        <!-- 账户 -->
+        <div class="bill-bar-item" @click="itemClickHandler(2)">
+            <div class="name">
+                <img src="~assets/img/account.svg">
+                <span>账户</span>
+            </div>
+            <div class="text">
+                <span>{{this.account}}</span>
+            </div>
+        </div>
+
+        <!-- 时间 -->
+        <div class="bill-bar-item" @click="itemClickHandler(3)">
+            <div class="name">
+                <img src="~assets/img/time.svg">
+                <span>时间</span>
+            </div>
+            <div class="text">
+                <span>{{timeShow}}</span>
+            </div>
+        </div>
+
+        <!-- 备注 -->
+        <div class="bill-bar-item" @click="itemClickHandler(4)">
+            <div class="name">
+                <img src="~assets/img/note.svg">
+                <span>备注</span>
+            </div>
+            <div class="text">
+                <input type="text" v-model="note" placeholder="..."></input>
+            </div>
+        </div>
+
 
         <div class="bill-bar-pop">
             <van-number-keyboard :show="isNumCpnShow" theme="custom" extra-key="." close-button-text="完成"
                 @blur="blurHandler" @delete="onDelete" @input="onInput" />
 
-            <van-picker show-toolbar ref="cat" v-show="isCatCpnShow" :columns="catCols" cancel-button-text=" "
+            <van-picker show-toolbar ref="cat" v-show="isCatCpnShow" :columns="cats" cancel-button-text=" "
                 :item-height="40" :visible-item-count="5" @change="catChangeHandler" @confirm="catConfirmHandler">
                 <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
             </van-picker>
@@ -54,13 +80,21 @@
 <script>
     import { NumberKeyboard, Picker, DatetimePicker } from 'vant';
 
-    import BillBarItem from "components/content/bill/BillBarItem.vue"
 
     export default {
+        components: {
+            [NumberKeyboard.name]: NumberKeyboard,
+            [Picker.name]: Picker,
+            [DatetimePicker.name]: DatetimePicker,
+        },
         props: {
-            color: {
-                type: String,
-                default: "#04BE02"
+            isOut: {
+                type: Boolean,
+                default: true,
+            },
+            trys: {
+                type: Number,
+                default: 0,
             }
         },
         data() {
@@ -68,17 +102,15 @@
 
                 currClicked: 0,
 
+                // 用户账单数据
                 num: "",
                 category: "",
                 account: "",
                 time: new Date(),
                 note: "",
 
-                // 数字键盘相关数据
-                numIdx: 0,
-
                 // 类别级联数据
-                catCols: [
+                outCatCols: [
                     {
                         text: "吃",
                         children: [{ text: "吃饭" }, { text: "零食" }]
@@ -90,6 +122,20 @@
                     {
                         text: "穿",
                         children: [{ text: "衣服" }, { text: "裤子" }, { text: "鞋子" }]
+                    },
+                ],
+                inCatCols: [
+                    {
+                        text: "营业收入",
+                        children: [{ text: "工资" }, { text: "兼职" }]
+                    },
+                    {
+                        text: "金融投资",
+                        children: [{ text: "利息" }, { text: "保险" }, { text: "退税" }]
+                    },
+                    {
+                        text: "其他收入",
+                        children: [{ text: "意外收入" }, { text: "退货退款" }]
                     },
                 ],
 
@@ -116,55 +162,50 @@
             }
         },
         created() {
-            this.category = this.catCols[0].text + " > " + this.catCols[0].children[0].text;
+            this.category = this.cats[0].text + " > " + this.cats[0].children[0].text;
             this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
-        },
-        components: {
-            [NumberKeyboard.name]: NumberKeyboard,
-            [Picker.name]: Picker,
-            [DatetimePicker.name]: DatetimePicker,
-            BillBarItem,
         },
         computed: {
 
-            // 键盘相关数据
-            isNumCpnShow() {
-                return this.currClicked == this.numIdx;
-            },
-            numShow() {
-                return this.num == "" ? "0.00" : parseFloat(this.num).toFixed(2);
-            },
-            NumBoxColorStyle() {
-                return { "color": this.color, "borderBottomColor": this.color }
-            },
-            NumBoxBorderStyle() {
-                return this.currClicked == this.numIdx ? { "borderBottomWidth": "2px" } : { "borderBottomWidth": "1px" }
+            // 支出收入分类
+            cats() {
+                return this.isOut ? this.outCatCols : this.inCatCols;
             },
 
-            // 分类组件相关数据
+            // 下拉菜单的隐显
+            isNumCpnShow() {
+                return this.currClicked == 0;
+            },
             isCatCpnShow() {
                 return this.currClicked == 1 && !this.isCatCpnDisappear;
             },
-
-            // 账户组件相关数据
             isAccountCpnShow() {
                 return this.currClicked == 2 && !this.isAccountDisappear;
             },
-
-            // 时间组件相关数据
             isTimeCnpShow() {
                 return this.currClicked == 3 && !this.isDateCnpDisappear;
             },
+
+            // 数据的展示
+            numShow() {
+                return this.num == "" ? "0.00" : parseFloat(this.num).toFixed(2);
+            },
             timeShow() {
+                let month = this.time.getMonth() + 1 < 10 ? "0" + (this.time.getMonth() + 1) : this.time.getMonth() + 1;
+                let date = this.time.getDate() < 10 ? "0" + this.time.getDate() : this.time.getDate();
                 let hours = this.time.getHours() < 10 ? "0" + this.time.getHours() : this.time.getHours();
                 let minutes = this.time.getMinutes() < 10 ? "0" + this.time.getMinutes() : this.time.getMinutes();
-                return this.time.getFullYear() + "年" + (this.time.getMonth() + 1) + "月" +
-                    this.time.getDate() + "日 " + hours + ":" + minutes;
+                return this.time.getFullYear() + "年" + month + "月" + date + "日 " + hours + ":" + minutes;
             },
 
+            // 金额被点击时的样式
+            NumBoxClickBorderStyle() {
+                return this.isNumCpnShow ? { "borderBottomWidth": "2px" } : { "borderBottomWidth": "1px" }
+            },
 
         },
         methods: {
+            // 点击事件
             itemClickHandler(idx) {
                 this.currClicked = idx;
                 if (idx == 1) {
@@ -185,12 +226,8 @@
                 }
             },
 
-            // 数字键盘组件相关处理
-            inputClickHandler() {
-                this.currClicked = 0;
-            },
             blurHandler() {
-                this.currClicked = 10;
+                this.currClicked = -1;
             },
             // van-number-keyboard组件一旦进行数据双向绑定(v-model)后, 则按照组件内部实现的onDelete方法来更新数据。此时使用onDelete无效。
             // 需要解除双向绑定，然后手写OnInput和onDelete方法。
@@ -269,6 +306,26 @@
                 this.isDateCnpDisappear = true;
                 this.currClicked = -1;
             },
+        },
+        watch: {
+            trys(newVal, oldVal) {
+                if (newVal > 0) {
+                    this.$emit("getData", {
+                        "isOut": this.isOut,
+                        "num": this.numShow,
+                        "category": this.category,
+                        "account": this.account,
+                        "time": this.timeShow,
+                        "note": this.note
+                    })
+                }
+            },
+            isOut(newVal, oldVal) {
+                this.currClicked = -1;
+                this.category = this.cats[0].text + " > " + this.cats[0].children[0].text;
+                this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
+            }
+
         }
     }
 </script>
@@ -282,13 +339,55 @@
 
     .bill-bar-number input {
         padding: 0;
-        border: 0 transparent;
+        border: 0;
         width: 100%;
         font-size: 40px;
-        /* color: #04BE02; */
+        /* 光标透明 */
         caret-color: transparent;
-        /* border-bottom: 1px solid #04BE02; */
         border-bottom-style: solid;
+    }
+
+    .bill-bar-item {
+        display: flex;
+        height: 50px;
+        line-height: 50px;
+        padding-left: 30px;
+    }
+
+    .bill-bar-item .name {
+        display: flex;
+        align-items: center;
+        border-bottom: solid 1px #f6f6f6;
+        flex: 1;
+    }
+
+    .bill-bar-item .text {
+        border-bottom: solid 1px #f6f6f6;
+        flex: 3
+    }
+
+    .bill-bar-item .name img {
+        width: 20px;
+        margin-right: 10px;
+    }
+
+    .bill-bar-item .name span {
+        font-size: 14px;
+    }
+
+    .bill-bar-item .text span {
+        display: inline-block;
+        width: 100%;
+        height: inherit;
+        font-size: 16px;
+        background-color: transparent;
+    }
+
+    .bill-bar-item .text input {
+        padding: 0;
+        border: 0;
+        background-color: transparent;
+        width: 80%;
     }
 
     .bill-bar-pop {
@@ -301,5 +400,13 @@
 
     .pulldown {
         height: 16px;
+    }
+
+    .outStyle {
+        color: #04BE02;
+    }
+
+    .inStyle {
+        color: red;
     }
 </style>

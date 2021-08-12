@@ -19,22 +19,29 @@
             <div class="out" @click="billoutClickHandle" :class="{'active': outActive}">支出</div>
             <div class="in" @click="billInClickHandle" :class="{'active': inActive}">收入</div>
         </div>
-        <bill-bar v-if="outActive"></bill-bar>
-        <bill-bar v-else color="red"></bill-bar>
+        <!-- <bill-bar v-if="outActive" :isSendData="isSubmitting" @getData="getDataHandler"></bill-bar> -->
+        <bill-bar :isOut="outActive" :trys="trys" @getData="getDataHandler">
+        </bill-bar>
+
+        <!-- 消息的展示 -->
+        <div v-if="this.$store.state.msg" class="alert">
+            <span>{{this.$store.state.msg}}</span>
+        </div>
     </div>
 </template>
 
 <script>
     import NavBar from "components/common/nav/NavBar.vue"
     import BillBar from "components/content/bill/BillBar.vue"
+    import { saveBill } from "../network/request.js"
     export default {
         data() {
             return {
                 // 是否是支出页面
                 isOut: true,
+                trys: 0,
             }
         },
-
         name: "billing",
         components: {
             NavBar,
@@ -59,8 +66,23 @@
                 this.$router.push("/home");
             },
             rightClickHandler() {
-                console.log("保存成功")
-                this.$router.push("/home");
+                this.trys++;
+            },
+            // 1. 从子组件BillBar中拿到data
+            // 2. 插入数据库
+            //      2.1 成功则跳转到/home页面, 并展示"成功提示"。
+            //      2.2 失败则停留在此页面，并展示"失败提示"
+            getDataHandler(data) {
+                saveBill({
+                    url: "/saveBill",
+                    params: { ...data, "userid": "1" }
+                }).then(res => {
+                    this.$store.dispatch("setMsg", { msg: "保存成功！" })
+                    this.$router.push("/home")
+                }).catch((err) => {
+                    console.log(err)
+                    this.$store.dispatch("setMsg", { msg: "保存失败！请重新提交" })
+                })
             }
         }
     }
@@ -124,5 +146,18 @@
 
     .inColor {
         color: red
+    }
+
+    .alert {
+        position: fixed;
+        bottom: 50%;
+        width: 100%;
+        text-align: center;
+    }
+
+    .alert span {
+        padding: 5px;
+        background-color: #222;
+        color: #fff;
     }
 </style>
