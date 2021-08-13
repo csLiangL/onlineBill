@@ -19,6 +19,7 @@
 
 <script>
     import BillBar from "components/content/bill/BillBar.vue"
+
     export default {
         data() {
             return {
@@ -29,7 +30,7 @@
 
         created() {
             this.rawdata = { ...this.$route.query };
-            this.rawdata.time = new Date
+            this.rawdata.time = 
         },
 
         computed: {
