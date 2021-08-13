@@ -12,36 +12,35 @@
             </div>
         </div>
 
-        <bill-bar v-if="data.isOut"></bill-bar>
-        <bill-bar v-else color="red"></bill-bar>
+        <bill-bar :isOut="rawdata.isOut=='true'" :trys="trys" @getData="getDataHandler" :billData="rawdata">
+        </bill-bar>
     </div>
 </template>
 
 <script>
-    import NavBar from "components/common/nav/NavBar.vue"
     import BillBar from "components/content/bill/BillBar.vue"
     export default {
         data() {
             return {
-                data: {}
+                rawdata: "",
+                trys: 0
             }
         },
 
-        mounted() {
-            this.data = this.$store.state.currEdit;
-            console.log("editing中的data", this.data)
+        created() {
+            this.rawdata = { ...this.$route.query };
+            this.rawdata.time = new Date
         },
 
         computed: {
 
             editText() {
-                return this.data.isOut ? "编辑支出" : "编辑收入";
+                return this.rawdata.isOut == "true" ? "编辑支出" : "编辑收入";
             }
         },
 
-        name: "billing",
+        name: "editing",
         components: {
-            NavBar,
             BillBar
         },
         methods: {
@@ -50,8 +49,19 @@
                 this.$router.push("/home")
             },
             rightClickHandler() {
-                console.log("保存成功")
-                this.$router.push("/home")
+                this.trys++;
+            },
+            getDataHandler(data) {
+                baseRequest({
+                    url: "/editBill",
+                    params: { ...data, "userid": "1" }
+                }).then(res => {
+                    this.$store.dispatch("setMsg", { msg: "保存成功！" })
+                    this.$router.push("/home")
+                }).catch((err) => {
+                    console.log(err)
+                    this.$store.dispatch("setMsg", { msg: "保存失败！请重新提交" })
+                })
             }
         }
     }

@@ -27,13 +27,14 @@
         <div v-if="this.$store.state.msg" class="alert">
             <span>{{this.$store.state.msg}}</span>
         </div>
+
     </div>
 </template>
 
 <script>
     import NavBar from "components/common/nav/NavBar.vue"
     import BillBar from "components/content/bill/BillBar.vue"
-    import { saveBill } from "../network/request.js"
+    import { baseRequest } from "../network/request.js"
     export default {
         data() {
             return {
@@ -73,7 +74,7 @@
             //      2.1 成功则跳转到/home页面, 并展示"成功提示"。
             //      2.2 失败则停留在此页面，并展示"失败提示"
             getDataHandler(data) {
-                saveBill({
+                baseRequest({
                     url: "/saveBill",
                     params: { ...data, "userid": "1" }
                 }).then(res => {

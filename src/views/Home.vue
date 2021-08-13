@@ -22,8 +22,8 @@
 
         <div class="record" v-for="(bill, bidx) in bills">
             <div class="date">
-                <span class="bigger">{{getDate(bill.date)}} </span>
-                <span class="grey">{{getYearMonth(bill.date)}}</span>
+                <span class="bigger">{{dp.getDate(bill.date)}}日 </span>
+                <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span>
             </div>
             <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists">
                 <div class="item" @click="billClickHander(item)">
@@ -33,19 +33,20 @@
                     <div class="item-note">
                         <div class="bigger">{{item.category.split(" ")[2]}}</div>
                         <div class="grey">{{item.note}}</div>
-                        <div class="grey">13:09 {{item.account.split(" ")[2]}}</div>
+                        <div class="grey">{{item.time.split(" ")[1]}} {{item.account.split(" ")[2]}}</div>
                     </div>
                     <div class="item-num">
-                        <span :class="{'inColor':!item.isOut}">{{parseFloat(item.num).toFixed(2)}}</span>
+                        <span :class="{'inColor':item.isOut==='false'}">{{parseFloat(item.num).toFixed(2)}}</span>
                     </div>
                 </div>
                 <template #right>
-                    <button class="delbtn" @click="delClickHandler(bidx, iidx)">删 除</button>
+                    <button class="delbtn" @click="delClickHandler(item)">删 除</button>
                 </template>
             </van-swipe-cell>
         </div>
-        <div id="tobill" @click.prevent="btnClickHandler">记一笔</div>
+
         <tab-bar></tab-bar>
+        <div id="tobill" @click.prevent="btnClickHandler">记一笔</div>
 
         <!-- 消息的展示 -->
         <div v-if="this.$store.state.msg" class="alert">
@@ -58,11 +59,13 @@
     import BillBarItem from "components/content/bill/BillNumber.vue"
     import { Swiper, SwiperItem } from "components/common/swiper/index.js"
     import { SwipeCell, Dialog } from "vant"
-    import { getBills } from "../network/request.js"
+    import { baseRequest, getBillsRequest } from "../network/request.js"
+    import { dateProcess } from "../commonFun.js"
 
     export default {
         data() {
             return {
+                dp: dateProcess,
                 banners: [
                     {
                         link: "https://pic.rmb.bdstatic.com/95d2e950343cd9054deb0cd3662bd9fd.jpeg",
@@ -81,79 +84,7 @@
                         img: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fenc.gaosouyi.com%2Fueditor%2Fphp%2Fupload%2Fimage%2F20150130%2F1422603989279511.jpg&refer=http%3A%2F%2Fenc.gaosouyi.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630244705&t=3fbdcba1174ffbf9d7df5ba4f0e542f2"
                     }
                 ],
-                bills: "",
-                // bills: [
-                //     {
-                //         date: "2021年8月10日",
-                //         lists: [
-                //             {
-                //                 idx: 1,
-                //                 num: 8.50,
-                //                 category: "食 > 吃饭",
-                //                 account: "现金 > 人民币",
-                //                 time: "2021年8月8日 13:09",
-                //                 note: "吃了一顿饭",
-                //                 isOut: true,
-                //             },
-                //             {
-                //                 idx: 1,
-                //                 num: 8.50,
-                //                 category: "食 > 吃饭",
-                //                 account: "现金 > 人民币",
-                //                 time: "2021/8/8 13:09",
-                //                 note: "",
-                //                 isOut: true,
-                //             },
-                //         ]
-                //     },
-                //     {
-                //         date: "2021年8月7日",
-                //         lists: [
-                //             {
-                //                 idx: 1,
-                //                 num: 8.50,
-                //                 category: "食 > 吃饭",
-                //                 account: "现金 > 人民币",
-                //                 time: "2021年8月8日 13:09",
-                //                 note: "",
-                //                 isOut: true,
-                //             },
-                //             {
-                //                 idx: 1,
-                //                 num: 8.50,
-                //                 category: "食 > 吃饭",
-                //                 account: "现金 > 人民币",
-                //                 time: "2021/8/8 13:09",
-                //                 note: "",
-                //                 isOut: true,
-                //             },
-                //         ]
-                //     },
-                //     {
-                //         date: "2021年8月2日",
-                //         lists: [
-                //             {
-                //                 idx: 1,
-                //                 num: 8.50,
-                //                 category: "食 > 吃饭",
-                //                 account: "现金 > 人民币",
-                //                 time: "2021年8月8日 13:09",
-                //                 note: "",
-                //                 isOut: true,
-                //             },
-                //             {
-                //                 idx: 1,
-                //                 num: 8.50,
-                //                 category: "食 > 吃饭",
-                //                 account: "现金 > 人民币",
-                //                 time: "2021/8/8 13:09",
-                //                 note: "",
-                //                 isOut: true,
-                //             },
-                //         ]
-                //     },
-
-                // ]
+                bills: ""
             }
         },
         components: {
@@ -164,10 +95,10 @@
             [SwipeCell.name]: SwipeCell,
             [Dialog.name]: Dialog,
         },
-
+        inject: ['reload'],
         created() {
             // 获得首页数据
-            getBills({
+            getBillsRequest({
                 url: "/getBills",
                 params: {
                     userid: "1"
@@ -178,48 +109,6 @@
             })
         },
 
-        computed: {
-            // 获得日
-            getDate() {
-                return date => date.split("月")[1];
-            },
-
-            // 获得年月，星期
-            getYearMonth() {
-                return date => {
-                    let year = date.split("年")[0]
-                    let month = parseInt(date.split("年")[1].split("月")[0]) - 1;
-                    let dt = this.getDate(date).split("日")[0];
-                    let day = new Date(year, month, dt).getDay();
-                    switch (day) {
-                        case 1:
-                            day = "一";
-                            break;
-                        case 2:
-                            day = "二";
-                            break;
-                        case 3:
-                            day = "三";
-                            break;
-                        case 4:
-                            day = "四";
-                            break;
-                        case 5:
-                            day = "五";
-                            break;
-                        case 6:
-                            day = "六";
-                            break;
-                        case 7:
-                            day = "日";
-                            break;
-                    }
-
-                    return (month + 1) + "." + year + " 周" + day;
-                }
-            }
-
-        },
         methods: {
 
             // "去记账"按钮
@@ -230,25 +119,41 @@
             // 关闭滑动前：记录点击位置，若是点击了删除，则弹出弹窗。
             // position 为关闭时点击的位置
             // instance 为对应的 SwipeCell 实例
-            delClickHandler(bidx, iidx) {
+            delClickHandler(item) {
                 this.$dialog.confirm({
                     message: '确定删除该笔账单吗？',
                 }).then((confirm) => {          // 点击确认
                     // 1.删除本地的数据
-                    this.bills[bidx].lists.splice(iidx, 1);
-                    if (this.bills[bidx].lists.length == 0) {
-                        this.bills.splice(bidx, 1)
-                    }
-                    // 2.删除数据库中的数据
-                    console.log(this.bills)
+                    // this.bills[bidx].lists.splice(iidx, 1);
+                    // if (this.bills[bidx].lists.length == 0) {
+                    //     this.bills.splice(bidx, 1)
+                    // }
+                    // 删除数据库中的数据, 并重新刷新页面
+                    baseRequest({
+                        url: "/delBill",
+                        params: {
+                            "_id": item._id,
+                        }
+                    }).then(res => {
+                        this.$store.dispatch("setMsg", { msg: "删除成功！" })
+                        this.reload();
+                    })
                 }).catch((cancel) => {         // 点击取消
                     console.log(cancel)
                 });
             },
 
             billClickHander(item) {
-                this.$store.state.currEdit = item;
-                this.$router.push("/editing")
+                // console.log("item:", item)
+                // let year = this.getYear(item.time);
+                // let month = parseInt(this.getMonth(item.time));
+                // let dt = this.getDate(item.time);
+                // let hour = this.getHour(item.time);
+                // let minute = this.getMinute(item.time)
+                // let rawdata = { ...item };
+                // rawdata.time = new Date(year, month - 1, dt, hour, minute)
+                // console.log("home:", rawdata)
+                this.$router.push({ path: "/editing", query: item })
             }
         }
     }

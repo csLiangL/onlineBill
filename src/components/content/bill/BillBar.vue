@@ -95,19 +95,32 @@
             trys: {
                 type: Number,
                 default: 0,
+            },
+            billData: {
+                type: Object,
+                default: () => {
+                    return {
+                        num: "",
+                        category: "",
+                        account: "",
+                        time: new Date(),
+                        note: "",
+                    }
+                }
             }
+
         },
         data() {
             return {
 
                 currClicked: 0,
 
-                // 用户账单数据
-                num: "",
-                category: "",
-                account: "",
-                time: new Date(),
-                note: "",
+                // 用户数据
+                num: this.billData.num,
+                category: this.billData.category,
+                account: this.billData.account,
+                time: new Date(this.billData.time),
+                note: this.billData.note,
 
                 // 类别级联数据
                 outCatCols: [
@@ -161,10 +174,15 @@
                 isDateCnpDisappear: false,
             }
         },
-        created() {
-            this.category = this.cats[0].text + " > " + this.cats[0].children[0].text;
-            this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
-        },
+        // created() {
+        //     console.log(this.time instanceof Date)
+        //     // if (!this.time instanceof Date) {
+        //     //     this.time = new Date(this.time)
+        //     // }
+        //     // console.log(this.time)
+        //     // this.category = this.cats[0].text + " > " + this.cats[0].children[0].text;
+        //     // this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
+        // },
         computed: {
 
             // 支出收入分类
@@ -191,6 +209,7 @@
                 return this.num == "" ? "0.00" : parseFloat(this.num).toFixed(2);
             },
             timeShow() {
+                console.log(this.time)
                 let month = this.time.getMonth() + 1 < 10 ? "0" + (this.time.getMonth() + 1) : this.time.getMonth() + 1;
                 let date = this.time.getDate() < 10 ? "0" + this.time.getDate() : this.time.getDate();
                 let hours = this.time.getHours() < 10 ? "0" + this.time.getHours() : this.time.getHours();
