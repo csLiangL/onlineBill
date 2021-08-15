@@ -19,6 +19,7 @@
 
 <script>
     import BillBar from "components/content/bill/BillBar.vue"
+    import { dateProcess } from "../commonFun.js"
 
     export default {
         data() {
@@ -30,7 +31,11 @@
 
         created() {
             this.rawdata = { ...this.$route.query };
-            this.rawdata.time = 
+            console.log("editing中接收到:",this.rawdata)
+            // this.rawdata.time = dateProcess.toDate(this.rawdata.time)
+            this.rawdata.time = new Date(this.rawdata.time)
+            // console.log("editing中:", this.rawdata)
+
         },
 
         computed: {
@@ -100,8 +105,6 @@
         flex: 5;
         /* background-color: red; */
     }
-
-
 
     .inColor {
         color: red

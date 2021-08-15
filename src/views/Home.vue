@@ -22,8 +22,10 @@
 
         <div class="record" v-for="(bill, bidx) in bills">
             <div class="date">
-                <span class="bigger">{{dp.getDate(bill.date)}}日 </span>
-                <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span>
+                <!-- <span class="bigger">{{dp.getDate(bill.date)}}日 </span> -->
+                <!-- <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span> -->
+                <span class="bigger">{{new Date(bill.date).getDate()}}日 </span>
+                <span class="grey">{{new Date(bill.date).getMonth() +1}}.{{new Date(bill.date).getFullYear()}} {{day(bill.date)}}</span>
             </div>
             <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists">
                 <div class="item" @click="billClickHander(item)">
@@ -33,7 +35,7 @@
                     <div class="item-note">
                         <div class="bigger">{{item.category.split(" ")[2]}}</div>
                         <div class="grey">{{item.note}}</div>
-                        <div class="grey">{{item.time.split(" ")[1]}} {{item.account.split(" ")[2]}}</div>
+                        <div class="grey">{{item.time.split("T")[1].split(":")[0]}}:{{item.time.split("T")[1].split(":")[1]}} {{item.account.split(" ")[2]}}</div>
                     </div>
                     <div class="item-num">
                         <span :class="{'inColor':item.isOut==='false'}">{{parseFloat(item.num).toFixed(2)}}</span>
@@ -60,12 +62,12 @@
     import { Swiper, SwiperItem } from "components/common/swiper/index.js"
     import { SwipeCell, Dialog } from "vant"
     import { baseRequest, getBillsRequest } from "../network/request.js"
-    import { dateProcess } from "../commonFun.js"
+    // import { dateProcess } from "../commonFun.js"
 
     export default {
         data() {
             return {
-                dp: dateProcess,
+                // dp: dateProcess,
                 banners: [
                     {
                         link: "https://pic.rmb.bdstatic.com/95d2e950343cd9054deb0cd3662bd9fd.jpeg",
@@ -85,6 +87,29 @@
                     }
                 ],
                 bills: ""
+            }
+        },
+
+        computed: {
+            day(){
+                return (date) => {
+                    switch (new Date(date).getDay()) {
+                        case 0:
+                            return "日"
+                        case 1:
+                            return "一";
+                        case 2:
+                            return "二";
+                        case 3:
+                            return "三";
+                        case 4:
+                            return "四";
+                        case 5:
+                            return "五";
+                        case 6:
+                            return "六";
+                    }
+                }
             }
         },
         components: {
@@ -108,6 +133,8 @@
                 console.log("home:", this.bills)
             })
         },
+
+
 
         methods: {
 
@@ -153,6 +180,7 @@
                 // let rawdata = { ...item };
                 // rawdata.time = new Date(year, month - 1, dt, hour, minute)
                 // console.log("home:", rawdata)
+                console.log("home向editing传递", item)
                 this.$router.push({ path: "/editing", query: item })
             }
         }
@@ -270,7 +298,7 @@
         width: 100%;
         border: 0;
         background-color: #ff3300;
-        border-radius: 8px;
+        /* border-radius: 8px; */
         color: #eee;
         font-size: 14px;
         padding: 0 10px;

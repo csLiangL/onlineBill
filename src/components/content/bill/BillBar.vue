@@ -116,10 +116,13 @@
                 currClicked: 0,
 
                 // 用户数据
+                // defaultData: {},
                 num: this.billData.num,
                 category: this.billData.category,
+                // category: this.billData.category === "" ? this.cats[0].text + " > " + this.cats[0].children[0].text : this.billData.category,
                 account: this.billData.account,
-                time: new Date(this.billData.time),
+                // account: this.billData.account === "" ? this.accountCols[0].text + " > " + this.accountCols[0].children[0].text : this.billData.account,
+                time: this.billData.time,
                 note: this.billData.note,
 
                 // 类别级联数据
@@ -174,16 +177,24 @@
                 isDateCnpDisappear: false,
             }
         },
-        // created() {
-        //     console.log(this.time instanceof Date)
-        //     // if (!this.time instanceof Date) {
-        //     //     this.time = new Date(this.time)
-        //     // }
-        //     // console.log(this.time)
-        //     // this.category = this.cats[0].text + " > " + this.cats[0].children[0].text;
-        //     // this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
-        // },
+        created() {
+            // console.log(this.time instanceof Date)
+            // if (!this.time instanceof Date) {
+            //     this.time = new Date(this.time)
+            // }
+            // console.log(this.time)
+            this.category = this.category ==="" ? this.cats[0].text + " > " + this.cats[0].children[0].text : this.category;
+            this.account = this.account==="" ?  this.accountCols[0].text + " > " + this.accountCols[0].children[0].text : this.account;
+        },
         computed: {
+
+            // 根据props返回默认的 记账分类 和 账户分类
+            // defaultCat(){
+            //     return this.billData.category === "" ? this.cats[0].text + " > " + this.cats[0].children[0].text : this.billData.category;
+            // },
+            // defaultAcnt(){
+            //     return this.billData.account === "" ? this.accountCols[0].text + " > " + this.accountCols[0].children[0].text : this.billData.account;
+            // },
 
             // 支出收入分类
             cats() {
@@ -229,6 +240,7 @@
                 this.currClicked = idx;
                 if (idx == 1) {
                     this.isCatCpnDisappear = false;
+                    console.log(this.category);
                     let Cats = this.category.split(" ");
                     this.$refs.cat.setValues([Cats[0], Cats[2]]);
                 }
@@ -331,10 +343,11 @@
                 if (newVal > 0) {
                     this.$emit("getData", {
                         "isOut": this.isOut,
-                        "num": this.numShow,
+                        "num": this.num,
                         "category": this.category,
                         "account": this.account,
-                        "time": this.timeShow,
+                        // "time": this.timeShow,
+                        "time": this.time,
                         "note": this.note
                     })
                 }
