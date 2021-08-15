@@ -25,7 +25,7 @@
                 <!-- <span class="bigger">{{dp.getDate(bill.date)}}日 </span> -->
                 <!-- <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span> -->
                 <span class="bigger">{{new Date(bill.date).getDate()}}日 </span>
-                <span class="grey">{{new Date(bill.date).getMonth() +1}}.{{new Date(bill.date).getFullYear()}} {{day(bill.date)}}</span>
+                <span class="grey">{{new Date(bill.date).getMonth() +1}}.{{new Date(bill.date).getFullYear()}} 周{{day(bill.date)}}</span>
             </div>
             <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists">
                 <div class="item" @click="billClickHander(item)">
