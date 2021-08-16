@@ -183,8 +183,8 @@
             //     this.time = new Date(this.time)
             // }
             // console.log(this.time)
-            this.category = this.category ==="" ? this.cats[0].text + " > " + this.cats[0].children[0].text : this.category;
-            this.account = this.account==="" ?  this.accountCols[0].text + " > " + this.accountCols[0].children[0].text : this.account;
+            this.category = this.category === "" ? this.cats[0].text + " > " + this.cats[0].children[0].text : this.category;
+            this.account = this.account === "" ? this.accountCols[0].text + " > " + this.accountCols[0].children[0].text : this.account;
         },
         computed: {
 
@@ -220,7 +220,7 @@
                 return this.num == "" ? "0.00" : parseFloat(this.num).toFixed(2);
             },
             timeShow() {
-                console.log(this.time)
+                // console.log(this.time)
                 let month = this.time.getMonth() + 1 < 10 ? "0" + (this.time.getMonth() + 1) : this.time.getMonth() + 1;
                 let date = this.time.getDate() < 10 ? "0" + this.time.getDate() : this.time.getDate();
                 let hours = this.time.getHours() < 10 ? "0" + this.time.getHours() : this.time.getHours();
@@ -341,15 +341,30 @@
         watch: {
             trys(newVal, oldVal) {
                 if (newVal > 0) {
+                    // 对日期进行处理
+                    // 发送网络请求时，会调用toJSON方法 将Date类型转换为JSON类型(转为UTC格式,滞后北京8小时)
+                    // 重写toJSON方法: 将Date类型转为 2021-08-07 07:05:01
+                    Date.prototype.toJSON = function () {
+                        let year = this.getFullYear();
+                        let month = this.getMonth() + 1 < 10 ? "0" + (this.getMonth() + 1) : this.getMonth() + 1;
+                        let date = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
+                        let hour = this.getHours() < 10 ? "0" + this.getHours() : this.getHours();
+                        let min = this.getMinutes() < 10 ? "0" + this.getMinutes() : this.getMinutes();
+                        return year + "-" + month + "-" + date + " " + hour + ":" + min;
+                    }
+                    let timeJSON = this.time.toJSON();
+                    // 对记账数据进行处理
+                    let numJSON = this.num == "" ? 0 : this.num;
+
                     this.$emit("getData", {
+                        "num": numJSON,
+                        "time": timeJSON,
                         "isOut": this.isOut,
-                        "num": this.num,
                         "category": this.category,
                         "account": this.account,
-                        // "time": this.timeShow,
-                        "time": this.time,
                         "note": this.note
                     })
+                    console.log("billbar中", this.time)
                 }
             },
             isOut(newVal, oldVal) {

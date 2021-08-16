@@ -19,7 +19,7 @@
 
 <script>
     import BillBar from "components/content/bill/BillBar.vue"
-    import { dateProcess } from "../commonFun.js"
+    import { baseRequest } from "../network/request.js"
 
     export default {
         data() {
@@ -31,9 +31,9 @@
 
         created() {
             this.rawdata = { ...this.$route.query };
-            console.log("editing中接收到:",this.rawdata)
-            // this.rawdata.time = dateProcess.toDate(this.rawdata.time)
             this.rawdata.time = new Date(this.rawdata.time)
+            // console.log("editing中接收到:", this.rawdata)
+            // this.rawdata.time = dateProcess.toDate(this.rawdata.time)
             // console.log("editing中:", this.rawdata)
 
         },
@@ -57,15 +57,16 @@
             rightClickHandler() {
                 this.trys++;
             },
+
             getDataHandler(data) {
                 baseRequest({
-                    url: "/editBill",
-                    params: { ...data, "userid": "1" }
+                    url: "/saveBill",
+                    params: { ...data, "userid": "1", "_id": this.rawdata._id }
                 }).then(res => {
+                    console.log(this.rawdata._id)
                     this.$store.dispatch("setMsg", { msg: "保存成功！" })
                     this.$router.push("/home")
                 }).catch((err) => {
-                    console.log(err)
                     this.$store.dispatch("setMsg", { msg: "保存失败！请重新提交" })
                 })
             }
