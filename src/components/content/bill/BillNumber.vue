@@ -9,10 +9,13 @@
 <script>
     import { NumberKeyboard } from 'vant';
     export default {
+        props: {
+            amount: "",
+        },
         data() {
             return {
                 // 操作的是value
-                value: "",
+                value: this.amount,
                 numBarShow: true,
                 borderBottomWidth: "2px",
             }
@@ -34,6 +37,7 @@
             blurHandler() {
                 this.numBarShow = false;
                 this.borderBottomWidth = "1px";
+                this.$emit("valueSend", this.value)
             },
             // van-number-keyboard组件一旦进行数据双向绑定(v-model)后, 则按照组件内部实现的onDelete方法来更新数据。此时使用onDelete无效。
             // 需要解除双向绑定，然后手写OnInput和onDelete方法。

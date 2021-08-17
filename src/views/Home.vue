@@ -10,13 +10,15 @@
 
         <!-- <button @click="btnClickHandler">去记账</button> -->
         <div id="month">
-            <div class="large text">本月</div>
-            <div class="text">预算结余</div>
-            <div class="large money">20.00</div>
-
-            <span class="text">收入 </span>
-            <span class="money">22000.00</span>
-            <span class="text"> | 支出 </span><span class="money">980.00</span>
+            <!-- <div class="large text">{{new Date().getMonth()+1}}月</div> -->
+            <div>
+                <span class="large">{{new Date().getMonth()+1}}</span>
+                <span class="grey"> 月 · 预算结余</span>
+            </div>
+            <div class="largest money">{{rest}}</div>
+            <span class="grey">收入 </span>
+            <span class="money">{{inCount}}</span>
+            <span class="grey"> | 支出 </span><span class="money">{{outCount}}</span>
 
         </div>
 
@@ -88,11 +90,61 @@
                         img: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fenc.gaosouyi.com%2Fueditor%2Fphp%2Fupload%2Fimage%2F20150130%2F1422603989279511.jpg&refer=http%3A%2F%2Fenc.gaosouyi.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630244705&t=3fbdcba1174ffbf9d7df5ba4f0e542f2"
                     }
                 ],
-                bills: ""
+                bills: []
             }
         },
 
         computed: {
+            // 返回本月账单
+            thisMonthBills() {
+                let year = new Date().getFullYear();
+                let month = new Date().getMonth() + 1;
+                let startDate = new Date(year + "-" + month);
+                if (month == 12) {
+                    year += 1;
+                    month = 1;
+                }
+                let endDate = new Date(year + "-" + (month + 1));
+
+                return this.bills.filter((obj) => {
+                    return (new Date(obj.date) >= startDate) && (new Date(obj.date) < endDate);
+                })
+            },
+            // BooleanStr: "true"表示返回本月支出金额, "false"表示返回本月收入金额。
+            inOrOutCount() {
+                return (BooleanStr) => {
+                    // console.log("本月账单:", this.thisMonthBills)
+                    let thisMonthBills = this.thisMonthBills;
+                    let sum = 0;
+                    for (let i = 0; i < thisMonthBills.length; i++) {
+                        // 该日期下的所有支出
+                        sum += thisMonthBills[i].lists.reduce((preValue, curr) => {
+                            if (curr.isOut === BooleanStr) {
+                                preValue += parseFloat(curr.num);
+                            }
+                            return preValue;
+                        }, 0)
+                    }
+                    return parseFloat(sum).toFixed(2);
+                }
+            },
+            // 本月支出
+            outCount() {
+
+                return this.inOrOutCount("true")
+            },
+            // 本月收入
+            inCount() {
+                return this.inOrOutCount("false")
+            },
+            // 预算结余
+            rest() {
+
+                let res = (parseFloat(this.$store.state.budget) - this.outCount).toFixed(2);
+                this.$store.commit("setRest", { "rest": res });
+                return res;
+            },
+
             day() {
                 return (date) => {
                     switch (new Date(date).getDay()) {
@@ -137,9 +189,7 @@
         },
 
 
-
         methods: {
-
             // "去记账"按钮
             btnClickHandler() {
                 this.$router.push("/billing")
@@ -202,15 +252,15 @@
         top: 0;
         height: 150px;
         background-color: transparent;
-        padding-top: 10px;
-        padding-left: 10px;
+        margin-top: 30px;
+        margin-left: 10px;
+        color: #fff;
     }
 
-
-    #month .text {
+    /* #month .text {
         font-size: 14px;
-        color: #ddd;
-    }
+        color: #aaa;
+    } */
 
     #month .money {
         font-size: 14px;
@@ -220,6 +270,11 @@
     #month .large {
         margin-top: 3px;
         font-size: 26px;
+        margin-bottom: 10px;
+    }
+
+    #month .largest {
+        font-size: 36px;
         margin-bottom: 10px;
     }
 
@@ -284,7 +339,7 @@
 
     .grey {
         font-size: 12px;
-        color: #aaaaaa;
+        color: #aaa;
     }
 
     .item-note .bigger {

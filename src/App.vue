@@ -10,6 +10,8 @@
 </template>
 
 <script>
+
+  import { baseRequest } from "./network/request.js"
   export default {
     data() {
       return {
@@ -20,6 +22,18 @@
       return {
         reload: this.reload
       }
+    },
+    created() {
+      // 获得预算数据
+      baseRequest({
+        url: "/getBudget",
+        params: {
+          userid: "1"
+        }
+      }).then(res => {
+        this.$store.commit("setBudget", { "budget": res.data.budget })
+        // this.budget = res.data.budget;
+      })
     },
     methods: {
       reload() {

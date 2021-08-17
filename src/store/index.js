@@ -3,13 +3,22 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+
 export default new Vuex.Store({
   state: {
-    msg: ""
+    budget: "",
+    msg: "",
+    rest: "",
   },
   mutations: {
     clearMsg(state) {
       state.msg = "";
+    },
+    setBudget(state, payload) {
+      state.budget = payload.budget;
+    },
+    setRest(state, payload) {
+      state.rest = payload.rest;
     }
   },
   actions: {

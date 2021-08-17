@@ -11,7 +11,7 @@
         <!-- 分类 -->
         <div class="bill-bar-item" @click="itemClickHandler(1)">
             <div class="name">
-                <img src="~assets/img/class.svg">
+                <img src="~assets/img/cate.svg">
                 <span>分类</span>
             </div>
             <div class="text">
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-    import { NumberKeyboard, Picker, DatetimePicker } from 'vant';
+    import { NumberKeyboard, Picker, DatetimePicker, Dialog } from 'vant';
 
 
     export default {
@@ -86,6 +86,7 @@
             [NumberKeyboard.name]: NumberKeyboard,
             [Picker.name]: Picker,
             [DatetimePicker.name]: DatetimePicker,
+            [Dialog.name]: Dialog,
         },
         props: {
             isOut: {
@@ -124,6 +125,9 @@
                 // account: this.billData.account === "" ? this.accountCols[0].text + " > " + this.accountCols[0].children[0].text : this.billData.account,
                 time: this.billData.time,
                 note: this.billData.note,
+
+                // 超出预算提醒
+                remind: true,
 
                 // 类别级联数据
                 outCatCols: [
@@ -356,15 +360,28 @@
                     // 对记账数据进行处理
                     let numJSON = this.num == "" ? 0 : this.num;
 
-                    this.$emit("getData", {
-                        "num": numJSON,
-                        "time": timeJSON,
-                        "isOut": this.isOut,
-                        "category": this.category,
-                        "account": this.account,
-                        "note": this.note
-                    })
-                    console.log("billbar中", this.time)
+                    // 预算不够 且 remind==true
+                    let rest = parseFloat(this.$store.state.rest) - parseFloat(this.num);
+                    if (rest < 0 && this.remind) {
+                        this.$dialog.confirm({
+                            message: '您本月预算不够了！',
+                            confirmButtonText: "不再提醒"
+                        }).then((comfirm) => {
+                            this.remind = false;
+                        }).catch(err => {
+                            console.log(err);
+                        })
+                    } else {
+                        this.$emit("getData", {
+                            "num": numJSON,
+                            "time": timeJSON,
+                            "isOut": this.isOut,
+                            "category": this.category,
+                            "account": this.account,
+                            "note": this.note
+                        })
+                    }
+                    // console.log("billbar中", this.time)
                 }
             },
             isOut(newVal, oldVal) {
@@ -372,7 +389,6 @@
                 this.category = this.cats[0].text + " > " + this.cats[0].children[0].text;
                 this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
             }
-
         }
     }
 </script>
