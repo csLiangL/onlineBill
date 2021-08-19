@@ -3,13 +3,20 @@
 
 
         <!-- 金额 -->
-        <div class="bill-bar-number">
-            <input type="text" :value="numShow" :class="[{'outStyle': isOut}, {'inStyle': !isOut}]"
+        <!-- <div class="bill-bar-number">
+            <input class="num-input" type="text" :value="numShow" :class="[{'outStyle': isOut}, {'inStyle': !isOut}]"
                 :style="NumBoxClickBorderStyle" @click="itemClickHandler(0)">
+        </div> -->
+
+        <div class="bill-bar-number">
+            <div class="num-input" :class="[{'outStyle': isOut}, {'inStyle': !isOut}]" :style="NumBoxClickBorderStyle"
+                @click="itemClickHandler(0)">
+                {{numShow}}
+            </div>
         </div>
 
         <!-- 分类 -->
-        <div class="bill-bar-item" @click="itemClickHandler(1)">
+        <div class="bill-bar-item" @click="itemClickHandler(1)" :class="{'clickStyle': currClicked==1}">
             <div class="name">
                 <img src="~assets/img/cate.svg">
                 <span>分类</span>
@@ -20,7 +27,7 @@
         </div>
 
         <!-- 账户 -->
-        <div class="bill-bar-item" @click="itemClickHandler(2)">
+        <div class="bill-bar-item" @click="itemClickHandler(2)" :class="{'clickStyle': currClicked==2}">
             <div class="name">
                 <img src="~assets/img/account.svg">
                 <span>账户</span>
@@ -31,7 +38,7 @@
         </div>
 
         <!-- 时间 -->
-        <div class="bill-bar-item" @click="itemClickHandler(3)">
+        <div class="bill-bar-item" @click="itemClickHandler(3)" :class="{'clickStyle': currClicked==3}">
             <div class="name">
                 <img src="~assets/img/time.svg">
                 <span>时间</span>
@@ -42,7 +49,7 @@
         </div>
 
         <!-- 备注 -->
-        <div class="bill-bar-item" @click="itemClickHandler(4)">
+        <div class="bill-bar-item" @click="itemClickHandler(4)" :class="{'clickStyle': currClicked==4}">
             <div class="name">
                 <img src="~assets/img/note.svg">
                 <span>备注</span>
@@ -359,10 +366,13 @@
                     let timeJSON = this.time.toJSON();
                     // 对记账数据进行处理
                     let numJSON = this.num == "" ? 0 : this.num;
+                    // 传进来的记账金额，要在预算中加上这部分。
+                    let preNum = this.billData.num == "" ? 0 : this.billData.num;
 
-                    // 预算不够 且 remind==true
-                    let rest = parseFloat(this.$store.state.rest) - parseFloat(this.num);
-                    if (rest < 0 && this.remind) {
+                    // 编辑支出 且 预算不够 且 remind==true
+                    let rest = parseFloat(this.$store.state.rest) + parseFloat(preNum) - parseFloat(this.num);
+                    console.log(this.isOut)
+                    if (this.isOut && rest < 0 && this.remind) {
                         this.$dialog.confirm({
                             message: '您本月预算不够了！',
                             confirmButtonText: "不再提醒"
@@ -385,7 +395,7 @@
                 }
             },
             isOut(newVal, oldVal) {
-                this.currClicked = -1;
+                this.currClicked = 0;
                 this.category = this.cats[0].text + " > " + this.cats[0].children[0].text;
                 this.account = this.accountCols[0].text + " > " + this.accountCols[0].children[0].text;
             }
@@ -397,10 +407,10 @@
     .bill-bar-number {
         height: 80px;
         line-height: 80px;
-        margin: 0px 0 30px 30px;
+        margin: 15px 0 15px 30px;
     }
 
-    .bill-bar-number input {
+    .bill-bar-number .num-input {
         padding: 0;
         border: 0;
         width: 100%;
@@ -408,6 +418,7 @@
         /* 光标透明 */
         caret-color: transparent;
         border-bottom-style: solid;
+        text-align: left;
     }
 
     .bill-bar-item {
@@ -471,5 +482,9 @@
 
     .inStyle {
         color: red;
+    }
+
+    .clickStyle {
+        background-color: #f6f6f6;
     }
 </style>

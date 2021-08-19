@@ -31,8 +31,9 @@
           userid: "1"
         }
       }).then(res => {
-        this.$store.commit("setBudget", { "budget": res.data.budget })
-        // this.budget = res.data.budget;
+        // let budget = !res.data.budget ? "0.00" : res.data.budget;
+        let budget = res.data.budget;
+        this.$store.commit("setBudget", { "budget": budget })
       })
     },
     methods: {

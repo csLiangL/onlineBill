@@ -1,9 +1,12 @@
 <template>
     <div class="bill-number">
-        <input type="text" :value="valueShow" :style="{borderBottomWidth: borderBottomWidth}"
-            @click="inputClickHandler">
+        <!-- <input type="text" :value="valueShow" :style="{borderBottomWidth: borderBottomWidth}"
+            @click="inputClickHandler"> -->
+        <div class="num-input" :style="{borderBottomWidth: borderBottomWidth}" @click="inputClickHandler">
+            {{valueShow}}
+        </div>
         <van-number-keyboard :show="numBarShow" theme="custom" extra-key="." close-button-text="完成" @blur="blurHandler"
-            @delete="onDelete" @input="onInput" />
+            @delete="onDelete" @input="onInput" @close="closeHandler" />
     </div>
 </template>
 <script>
@@ -35,8 +38,11 @@
                 this.$emit("billNumClick");
             },
             blurHandler() {
+                console.log("blur被触发了")
                 this.numBarShow = false;
                 this.borderBottomWidth = "1px";
+            },
+            closeHandler() {
                 this.$emit("valueSend", this.value)
             },
             // van-number-keyboard组件一旦进行数据双向绑定(v-model)后, 则按照组件内部实现的onDelete方法来更新数据。此时使用onDelete无效。
@@ -84,10 +90,10 @@
     .bill-number {
         height: 80px;
         line-height: 80px;
-        margin: 30px 0 30px 30px;
+        margin: 15px 0 15px 30px;
     }
 
-    .bill-number input {
+    .bill-number .num-input {
         padding: 0;
         border: 0 transparent;
         width: 100%;
@@ -95,5 +101,6 @@
         color: #04BE02;
         caret-color: transparent;
         border-bottom: 1px solid #04BE02;
+        text-align: left;
     }
 </style>

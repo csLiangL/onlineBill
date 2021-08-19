@@ -16,7 +16,7 @@
                     <img src="~assets/img/budget.svg" alt="" class="image">
                 </template>
             </van-cell>
-            <van-cell title="图表分析" is-link class="bar-item">
+            <van-cell title="图表分析" is-link class="bar-item" url="/charts">
                 <template slot="icon">
                     <img src="~assets/img/charts-active.svg" alt="" class="image">
                 </template>
@@ -28,7 +28,7 @@
             </van-cell>
 
             <van-popup v-model="show" class="popup">
-                <span>{{new Date().getMonth()+1}}月预算</span>
+                <div class="popup-title">{{new Date().getMonth()+1}}月预算</div>
                 <!-- <van-field v-model="budget" label="预算" />
                 <van-number-keyboard :show="show" theme="custom" extra-key="." close-button-text="完成"
                     @blur="show = false" @input="onInput" @delete="onDelete" /> -->
@@ -150,13 +150,17 @@
     }
 
     .popup {
-        width: 80%;
-        height: 50%;
+        width: 75%;
+        height: 75%;
         text-align: center;
         line-height: 30px;
         border-radius: 10px;
     }
 
+    .popup .popup-title {
+        padding-top: 20px;
+        font-size: 18px;
+    }
 
     /* .inputBudget {
         border: 0px;

@@ -143,7 +143,6 @@
         box-shadow: 0 1px 0px 1px rgba(0, 0, 0, .08);
         background-color: #f6f6f6;
         /* padding-bottom: 5px; */
-        margin-bottom: 10px;
     }
 
     .outIn .in,

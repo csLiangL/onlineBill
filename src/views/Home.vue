@@ -22,34 +22,36 @@
 
         </div>
 
-        <div class="record" v-for="(bill, bidx) in bills">
-            <div class="date">
-                <!-- <span class="bigger">{{dp.getDate(bill.date)}}日 </span> -->
-                <!-- <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span> -->
-                <span class="bigger">{{new Date(bill.date).getDate()}}日 </span>
-                <span class="grey">{{new Date(bill.date).getMonth() +1}}.{{new Date(bill.date).getFullYear()}}
-                    周{{day(bill.date)}}</span>
-            </div>
-            <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists">
-                <div class="item" @click="billClickHander(item)">
-                    <div class="item-icon">
-                        <img src="~assets/img/edit.svg" alt="">
-                    </div>
-                    <div class="item-note">
-                        <div class="bigger">{{item.category.split(" ")[2]}}</div>
-                        <div class="grey">{{item.note}}</div>
-                        <div class="grey">
-                            {{item.time.split(" ")[1].split(":")[0]}}:{{item.time.split(" ")[1].split(":")[1]}}
-                            {{item.account.split(" ")[2]}}</div>
-                    </div>
-                    <div class="item-num">
-                        <span :class="{'inColor':item.isOut==='false'}">{{parseFloat(item.num).toFixed(2)}}</span>
-                    </div>
+        <div class="records">
+            <div class="record" v-for="(bill, bidx) in bills">
+                <div class="date">
+                    <!-- <span class="bigger">{{dp.getDate(bill.date)}}日 </span> -->
+                    <!-- <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span> -->
+                    <span class="bigger">{{new Date(bill.date).getDate()}}日 </span>
+                    <span class="grey">{{new Date(bill.date).getMonth() +1}}.{{new Date(bill.date).getFullYear()}}
+                        周{{day(bill.date)}}</span>
                 </div>
-                <template #right>
-                    <button class="delbtn" @click="delClickHandler(item)">删 除</button>
-                </template>
-            </van-swipe-cell>
+                <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists" right-width="60">
+                    <div class="item" @click="billClickHander(item)">
+                        <div class="item-icon">
+                            <img src="~assets/img/edit.svg" alt="">
+                        </div>
+                        <div class="item-note">
+                            <div class="bigger">{{item.category.split(" ")[2]}}</div>
+                            <div class="grey">{{item.note}}</div>
+                            <div class="grey">
+                                {{item.time.split(" ")[1].split(":")[0]}}:{{item.time.split(" ")[1].split(":")[1]}}
+                                {{item.account.split(" ")[2]}}</div>
+                        </div>
+                        <div class="item-num">
+                            <span :class="{'inColor':item.isOut==='false'}">{{parseFloat(item.num).toFixed(2)}}</span>
+                        </div>
+                    </div>
+                    <template #right>
+                        <button class="delbtn" @click="delClickHandler(item)">删 除</button>
+                    </template>
+                </van-swipe-cell>
+            </div>
         </div>
 
         <tab-bar></tab-bar>
@@ -139,7 +141,6 @@
             },
             // 预算结余
             rest() {
-
                 let res = (parseFloat(this.$store.state.budget) - this.outCount).toFixed(2);
                 this.$store.commit("setRest", { "rest": res });
                 return res;
@@ -282,14 +283,18 @@
         position: fixed;
         bottom: 60px;
         left: 50%;
-        margin-left: -50px;
-        width: 100px;
-        height: 30px;
-        line-height: 30px;
-        border-radius: 14px;
+        margin-left: -60px;
+        width: 120px;
+        height: 36px;
+        line-height: 36px;
+        border-radius: 18px;
         background-color: #DAA520;
         text-align: center;
         color: #fff;
+    }
+
+    .records {
+        margin-bottom: 100px;
     }
 
     .record {
@@ -358,7 +363,7 @@
         /* border-radius: 8px; */
         color: #eee;
         font-size: 14px;
-        padding: 0 10px;
+        padding: 0 14px;
     }
 
     .inColor {
