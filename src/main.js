@@ -4,6 +4,9 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 
+// 全局echarts对象的挂载
+Vue.prototype.$echarts = window.echarts;
+
 Vue.config.productionTip = false
 
 new Vue({
