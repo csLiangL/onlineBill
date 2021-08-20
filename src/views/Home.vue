@@ -101,12 +101,12 @@
             thisMonthBills() {
                 let year = new Date().getFullYear();
                 let month = new Date().getMonth() + 1;
-                let startDate = new Date(year + "-" + month);
+                let startDate = new Date(year + "/" + month);
                 if (month == 12) {
                     year += 1;
                     month = 1;
                 }
-                let endDate = new Date(year + "-" + (month + 1));
+                let endDate = new Date(year + "/" + (month + 1));
 
                 return this.bills.filter((obj) => {
                     return (new Date(obj.date) >= startDate) && (new Date(obj.date) < endDate);

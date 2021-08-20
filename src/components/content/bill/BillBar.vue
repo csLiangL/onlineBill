@@ -361,7 +361,7 @@
                         let date = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
                         let hour = this.getHours() < 10 ? "0" + this.getHours() : this.getHours();
                         let min = this.getMinutes() < 10 ? "0" + this.getMinutes() : this.getMinutes();
-                        return year + "-" + month + "-" + date + " " + hour + ":" + min;
+                        return year + "/" + month + "/" + date + " " + hour + ":" + min;
                     }
                     let timeJSON = this.time.toJSON();
                     // 对记账数据进行处理
