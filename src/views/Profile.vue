@@ -5,8 +5,8 @@
                 <img src="~assets/img/user.svg" alt="">
             </div>
             <div class="user-name">
-                <div>李四</div>
-                <div class="user-phone">1880383988</div>
+                <div>良良</div>
+                <div class="user-phone">188****3028</div>
             </div>
         </div>
 

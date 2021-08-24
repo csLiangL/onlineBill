@@ -8,7 +8,6 @@
             </swiper-item>
         </swiper>
 
-        <!-- <button @click="btnClickHandler">去记账</button> -->
         <div id="month">
             <!-- <div class="large text">{{new Date().getMonth()+1}}月</div> -->
             <div>
@@ -19,20 +18,19 @@
             <span class="grey">收入 </span>
             <span class="money">{{inCount}}</span>
             <span class="grey"> | 支出 </span><span class="money">{{outCount}}</span>
-
         </div>
 
         <div class="records">
-            <div class="record" v-for="(bill, bidx) in bills">
+            <div class="record" v-for="(bill, bidx) in billsIters">
                 <div class="date">
                     <!-- <span class="bigger">{{dp.getDate(bill.date)}}日 </span> -->
                     <!-- <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span> -->
-                    <span class="bigger">{{new Date(bill.date).getDate()}}日 </span>
-                    <span class="grey">{{new Date(bill.date).getMonth() +1}}.{{new Date(bill.date).getFullYear()}}
+                    <span class="bigger">{{bill.date.split("/")[2]}}日 </span>
+                    <span class="grey">{{bill.date.split("/")[1]}}.{{bill.date.split("/")[0]}}
                         周{{day(bill.date)}}</span>
                 </div>
                 <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists" right-width="60">
-                    <div class="item" @click="billClickHander(item)">
+                    <div class="item" @click="billClickHander(item, bidx, iidx)" :class="{'item-active': currX==bidx && currY==iidx}">
                         <div class="item-icon">
                             <img src="~assets/img/edit.svg" alt="">
                         </div>
@@ -55,7 +53,7 @@
         </div>
 
         <tab-bar></tab-bar>
-        <div id="tobill" @click.prevent="btnClickHandler">记一笔</div>
+        <div class="tobill" @click.prevent="btnClickHandler" :class="{'bill-active': billClicked}">记一笔</div>
 
         <!-- 消息的展示 -->
         <div v-if="this.$store.state.msg" class="alert">
@@ -71,9 +69,18 @@
     import { baseRequest, getBillsRequest } from "../network/request.js"
 
     export default {
+
+        components: {
+            TabBar,
+            Swiper,
+            SwiperItem,
+            BillBarItem,
+            [SwipeCell.name]: SwipeCell,
+            [Dialog.name]: Dialog,
+        },
+
         data() {
             return {
-                // dp: dateProcess,
                 banners: [
                     {
                         link: "https://pic.rmb.bdstatic.com/95d2e950343cd9054deb0cd3662bd9fd.jpeg",
@@ -92,53 +99,37 @@
                         img: "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fenc.gaosouyi.com%2Fueditor%2Fphp%2Fupload%2Fimage%2F20150130%2F1422603989279511.jpg&refer=http%3A%2F%2Fenc.gaosouyi.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1630244705&t=3fbdcba1174ffbf9d7df5ba4f0e542f2"
                     }
                 ],
-                bills: []
+                bills: [],      // 服务器请求的账单数据
+                outCount: parseFloat(0).toFixed(2),
+                inCount:parseFloat(0).toFixed(2),
+                currX: -1,
+                currY: -1,
+                billClicked: false,
             }
         },
 
         computed: {
-            // 返回本月账单
-            thisMonthBills() {
-                let year = new Date().getFullYear();
-                let month = new Date().getMonth() + 1;
-                let startDate = new Date(year + "/" + month);
-                if (month == 12) {
-                    year += 1;
-                    month = 1;
-                }
-                let endDate = new Date(year + "/" + (month + 1));
-
-                return this.bills.filter((obj) => {
-                    return (new Date(obj.date) >= startDate) && (new Date(obj.date) < endDate);
-                })
-            },
-            // BooleanStr: "true"表示返回本月支出金额, "false"表示返回本月收入金额。
-            inOrOutCount() {
-                return (BooleanStr) => {
-                    // console.log("本月账单:", this.thisMonthBills)
-                    let thisMonthBills = this.thisMonthBills;
-                    let sum = 0;
-                    for (let i = 0; i < thisMonthBills.length; i++) {
-                        // 该日期下的所有支出
-                        sum += thisMonthBills[i].lists.reduce((preValue, curr) => {
-                            if (curr.isOut === BooleanStr) {
-                                preValue += parseFloat(curr.num);
-                            }
-                            return preValue;
-                        }, 0)
+            // 对bills按日期分类，便于在template中迭代。
+            billsIters(){
+                let dateBills = new Map();
+                // console.log("this.bills", this.bills)
+                this.bills.forEach(obj=>{
+                    let date = obj.time.split(" ")[0];
+                    if(dateBills.has(date)){
+                        dateBills.get(date).push(obj);
+                    }else{
+                        dateBills.set(date, [obj]);
                     }
-                    return parseFloat(sum).toFixed(2);
-                }
-            },
-            // 本月支出
-            outCount() {
+                })
 
-                return this.inOrOutCount("true")
+                let res = [];
+                for(let date of dateBills.keys()){
+                    res.push({"date": date, "lists": dateBills.get(date)});
+                }
+                return res;
+                
             },
-            // 本月收入
-            inCount() {
-                return this.inOrOutCount("false")
-            },
+      
             // 预算结余
             rest() {
                 let res = (parseFloat(this.$store.state.budget) - this.outCount).toFixed(2);
@@ -146,6 +137,7 @@
                 return res;
             },
 
+            // 计算周一、周二...
             day() {
                 return (date) => {
                     switch (new Date(date).getDay()) {
@@ -167,33 +159,60 @@
                 }
             }
         },
-        components: {
-            TabBar,
-            Swiper,
-            SwiperItem,
-            BillBarItem,
-            [SwipeCell.name]: SwipeCell,
-            [Dialog.name]: Dialog,
-        },
-        inject: ['reload'],
-        created() {
-            // 获得首页数据
-            getBillsRequest({
-                url: "/getBills",
-                params: {
-                    userid: "1"
-                }
-            }).then(res => {
-                this.bills = res;
-                console.log("home:", this.bills)
-            })
-        },
 
+        inject: ['reload'],                         
+
+        created() {
+            this.getBills();
+            this.getOutIn();
+        },
 
         methods: {
+
+            // 获得账单数据
+            getBills(){
+                baseRequest({
+                    url: "/getBills",
+                    params: {
+                        "userid": "1",
+                    }
+                }).then(res=>{
+                    this.bills = res.data;
+                    // console.log(this.bills)
+                })
+            },
+
+            // 获得本月收入支出数据
+            getOutIn(){
+                baseRequest({
+                    url:"/getOutIn",
+                    params: {
+                        "isMonth": "true",
+                        "userid": "1",
+                        "time": new Date().getFullYear() + "/" + (new Date().getMonth()+1)
+                    }
+                }).then(res=>{
+                    this.inCount = parseFloat(res.data.in.reduce((pre, curr)=>{
+                        pre+=curr;
+                        return pre;
+                    }, 0)).toFixed(2);
+
+                    this.outCount = parseFloat(res.data.out.reduce((pre, curr)=>{
+                        pre+=curr;
+                        return pre;
+                    }, 0)).toFixed(2);
+                })
+            },
+
             // "去记账"按钮
             btnClickHandler() {
-                this.$router.push("/billing")
+                this.billClicked = true;
+                setTimeout(() => {
+                    this.billClicked = false;
+                }, 100);
+                setTimeout(() => {
+                    this.$router.push("/billing")
+                }, 200);
             },
 
             // 关闭滑动前：记录点击位置，若是点击了删除，则弹出弹窗。
@@ -223,18 +242,18 @@
                 });
             },
 
-            billClickHander(item) {
-                // console.log("item:", item)
-                // let year = this.getYear(item.time);
-                // let month = parseInt(this.getMonth(item.time));
-                // let dt = this.getDate(item.time);
-                // let hour = this.getHour(item.time);
-                // let minute = this.getMinute(item.time)
-                // let rawdata = { ...item };
-                // rawdata.time = new Date(year, month - 1, dt, hour, minute)
-                // console.log("home:", rawdata)
-                console.log("home向editing传递", item)
-                this.$router.push({ path: "/editing", query: item })
+            // 点击账单进行编辑。
+            billClickHander(item, bidx, iidx) {
+                this.currX = bidx;
+                this.currY = iidx;
+
+                setTimeout(() => {
+                    this.currX = -1;
+                    this.currY = -1;
+                }, 100);
+                setTimeout(() => {
+                    this.$router.push({ path: "/editing", query: item })
+                }, 200);
             }
         }
     }
@@ -279,7 +298,7 @@
         margin-bottom: 10px;
     }
 
-    #tobill {
+    .tobill {
         position: fixed;
         bottom: 60px;
         left: 50%;
@@ -291,6 +310,10 @@
         background-color: #DAA520;
         text-align: center;
         color: #fff;
+    }
+
+    .bill-active{
+        background-color: #eed188;
     }
 
     .records {
@@ -312,6 +335,10 @@
         justify-items: center;
         padding: 8px 0;
         border-bottom: 1px solid #f6f6f6;
+    }
+
+    .item-active{
+        background-color: #f6f6f6;
     }
 
     .item .item-icon {
@@ -382,4 +409,10 @@
         background-color: #222;
         color: #fff;
     }
+
+    
+
+    
+
+
 </style>

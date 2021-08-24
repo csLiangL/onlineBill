@@ -23,23 +23,11 @@
                 console.log("initChart", this.chartInstance)
             },
             getData() {
-                console.log("getData")
                 this.updateChart();
             },
             updateChart() {
                 console.log("updateChart")
                 const option = {
-                    // backgroundColor: '#ff',
-
-                    // title: {
-                    //     text: 'Customized Pie',
-                    //     left: 'center',
-                    //     top: 20,
-                    //     textStyle: {
-                    //         color: '#ccc'
-                    //     }
-                    // },
-
                     tooltip: {
                         trigger: 'item'
                     },

@@ -23,13 +23,14 @@
 
         <div class="chart">
             <div class="chart-title">支出趋势</div>
-            <line-chart></line-chart>
+            <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
+            <div class="chart-container" ref="line_chart"></div>
         </div>
-
-
+        
         <div class="chart">
             <div class="chart-title">分类支出排行</div>
-            <bar-chart></bar-chart>
+            <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
+            <div class="chart-container" ref="bar_chart"></div>
         </div>
 
         <van-datetime-picker class="time-picker" v-model="time" type="year-month" v-show="isMonth&&isMonthPickShow"
@@ -52,6 +53,7 @@
     import LineChart from "components/content/charts/LineChart.vue"
     import BarChart from "components/content/charts/BarChart.vue"
     import { DatetimePicker, Picker } from 'vant';
+    import { baseRequest } from "@/network/request.js"
     export default {
         components: {
             TabBar,
@@ -68,17 +70,116 @@
                 isYearPickShow: false,
                 time: new Date(),                               // 记录当前月份的完整时间
                 year: "" + new Date().getFullYear() + "年",     // 记录当前年份
+
+                lineChart: null,
+                LineX: [],
+                LineY: [],
+
+                barChart: null,
+                barData:[],
             }
         },
         computed: {
             timeShow() {
-                console.log(this.time)
                 let month = this.time.getMonth() + 1 < 10 ? "0" + (this.time.getMonth() + 1) : this.time.getMonth() + 1;
                 let date = this.time.getDate() < 10 ? "0" + this.time.getDate() : this.time.getDate();
-                return this.time.getFullYear() + "年" + month + "月";
+                return this.time.getFullYear() + "/" + month;
+            },
+            queryTime() {
+                return this.isMonth ? this.timeShow : this.year.split("年")[0];
             }
         },
+
+        mounted() {
+            this.initChart();
+            this.getData();
+        },
+
         methods: {
+            initChart() {
+                this.lineChart = this.$echarts.init(this.$refs.line_chart);
+                this.barChart = this.$echarts.init(this.$refs.bar_chart);
+            },
+
+            async getData() {
+                const { data: ret } = await baseRequest({
+                    url: "/getOutIn",
+                    params: { "userid": 1, "time": this.queryTime, "isMonth": this.isMonth }
+                })
+                this.LineX = ret.title;
+                if (this.isOut) {
+                    this.LineY = ret.out;
+                    this.barData = ret.catOut;
+                } else {
+                    this.barData = ret.catIn;
+                    this.LineY = ret.in;
+                }
+                this.updateChart();
+            },
+
+            updateChart() {
+                const line_option = {
+                    grid: {
+                        left: "18%",
+                    },
+
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+
+                    xAxis: {
+                        type: 'category',
+                        data: this.LineX,
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [{
+                        data: this.LineY,
+                        type: 'line',
+                        smooth: true,
+                        itemStyle:{
+                            color: "#DAA520"
+                        },
+                    }]
+                };
+
+                // 更新bar_chart
+                const bar_option = {
+                    tooltip: {
+                        trigger: 'item'
+                    },
+                    series: [
+                        {
+                            type: 'pie',
+                            radius: ["40%", "70%"],
+                            center: ['50%', '50%'],
+                            data: this.barData.sort(function (a, b) { return a.value - b.value; }),
+                            // roseType: 'area',
+                            label: {
+                                color: 'rgba(0, 0, 0, 0.5)'
+                            },
+                            labelLine: {
+                                lineStyle: {
+                                    color: 'rgba(0, 0, 0, 0.5)'
+                                },
+                                smooth: 0.2,
+                                length: 10,
+                                length2: 20
+                            },
+                            itemStyle: {
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            },
+                        }
+                    ]
+                }
+                // if(this.barData.length!=0){
+                //     let lineChart = this.$echarts.init(this.$refs.line_chart);
+                //     let barChart = this.$echarts.init(this.$refs.bar_chart);
+                    this.lineChart.setOption(line_option);
+                    this.barChart.setOption(bar_option);
+                // }
+            },
 
             monthClickHandler() {
                 this.isMonth = true;
@@ -88,9 +189,11 @@
             outClickHandler() {
                 this.isOut = true;
             },
+
             inClickHandler() {
                 this.isOut = false;
             },
+
             timeClickHandler() {
                 if (this.isMonth) {
                     this.isMonthPickShow = true;
@@ -107,9 +210,11 @@
                     return val + '月';
                 }
             },
+
             dateConfirmHandler() {
                 this.isMonthPickShow = false;
             },
+
             yearChangeHandler(picker) {
                 this.year = picker.getValues()[0];
                 // console.log(picker.getValues()[0]);
@@ -122,6 +227,27 @@
                 this.isMonthPickShow = false;
                 console.log(this.$refs.year.setValues([this.year]));
             },
+
+        },
+
+        watch:{
+            time(){
+                // this.isgetData = true;
+                // console.log("time改变了")
+                this.getData();
+            },
+            year(){
+                // console.log("year改变了")
+                this.getData();
+            },
+            isOut(){
+                // console.log("isOut改变了")
+                this.getData();
+            },
+            isMonth(){
+                // console.log("isMonth改变了")
+                this.getData();
+            }
         }
     }
 </script>
@@ -210,5 +336,16 @@
 
     .time-picker .pulldown {
         height: 16px;
+    }
+
+    .chart-container {
+        width: 100%;
+        height: 300px;
+    }
+
+    .nothing{
+        color: #666;
+        font-size: larger;
+        text-align: center;
     }
 </style>

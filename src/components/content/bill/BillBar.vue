@@ -354,7 +354,7 @@
                 if (newVal > 0) {
                     // 对日期进行处理
                     // 发送网络请求时，会调用toJSON方法 将Date类型转换为JSON类型(转为UTC格式,滞后北京8小时)
-                    // 重写toJSON方法: 将Date类型转为 2021-08-07 07:05:01
+                    // 重写toJSON方法: 将Date类型转为 2021/08/07 07:05:01
                     Date.prototype.toJSON = function () {
                         let year = this.getFullYear();
                         let month = this.getMonth() + 1 < 10 ? "0" + (this.getMonth() + 1) : this.getMonth() + 1;
@@ -384,7 +384,8 @@
                     } else {
                         this.$emit("getData", {
                             "num": numJSON,
-                            "time": timeJSON,
+                            // "time": timeJSON,
+                            "time": this.time,
                             "isOut": this.isOut,
                             "category": this.category,
                             "account": this.account,

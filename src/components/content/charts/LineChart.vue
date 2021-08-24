@@ -4,30 +4,28 @@
 </template>
 
 <script>
+
     export default {
-        data() {
-            return {
-                chartInstance: null,
-                // allData: null,    // 服务器返回的数据
+
+        props: {
+            x: {
+                type: Array,
+                default: () => []
+            },
+            y: {
+                type: Array,
+                default: () => []
             }
         },
 
         mounted() {
             this.initChart();
-            this.getData();
         },
 
         methods: {
             initChart() {
-                this.chartInstance = this.$echarts.init(this.$refs.line_chart);
-                console.log("initChart", this.chartInstance)
-            },
-            getData() {
-                console.log("getData")
-                this.updateChart();
-            },
-            updateChart() {
-                console.log("updateChart")
+                // console.log("initCharts", this.x, this.y)
+                let chartInstance = this.$echarts.init(this.$refs.line_chart);
                 const option = {
                     grid: {
                         left: "18%",
@@ -39,19 +37,19 @@
 
                     xAxis: {
                         type: 'category',
-                        data: ['1', '2', '3', '4', '5', '6', '7', '1', '2', '3', '4', '5', '6', '7',]
+                        data: this.x,
                     },
                     yAxis: {
                         type: 'value'
                     },
                     series: [{
-                        data: [820, 932, 901, 934, 1290, 1330, 1000, 820, 932, 901, 934, 1290, 1330, 1000],
+                        data: this.y,
                         type: 'line',
                         smooth: true
                     }]
                 };
-                this.chartInstance.setOption(option);
-            }
+                chartInstance.setOption(option);
+            },
         }
     }
 </script>
