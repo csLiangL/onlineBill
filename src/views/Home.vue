@@ -72,7 +72,7 @@
     import BillBarItem from "components/content/bill/BillNumber.vue"
     import { Swiper, SwiperItem } from "components/common/swiper/index.js"
     import { SwipeCell, Dialog, List, PullRefresh } from "vant"
-    import { baseRequest, getBillsRequest } from "../network/request.js"
+    import { baseRequest } from "../network/request.js"
 
     export default {
 
@@ -199,7 +199,7 @@
                         this.bills.push(...res.data);
                         this.currPage++;
                     }
-                    console.log(this.bills)
+                    this.loading = false;
                 }).finally(() => {
                     setTimeout(() => {
                         this.bus.$emit("Loading", false);
@@ -286,7 +286,7 @@
             onLoad() {
                 // 加载数据
                 this.getBills();
-                this.loading = false;
+                // this.loading = false;
             },
 
             // 下拉刷新
