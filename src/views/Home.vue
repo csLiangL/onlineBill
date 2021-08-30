@@ -20,37 +20,43 @@
             <span class="grey"> | 支出 </span><span class="money">{{outCount}}</span>
         </div>
 
-        <div class="records">
-            <div class="record" v-for="(bill, bidx) in billsIters">
-                <div class="date">
-                    <!-- <span class="bigger">{{dp.getDate(bill.date)}}日 </span> -->
-                    <!-- <span class="grey">{{dp.getMonth(bill.date)}}.{{dp.getYear(bill.date)}} {{dp.getDay(bill.date)}}</span> -->
-                    <span class="bigger">{{bill.date.split("/")[2]}}日 </span>
-                    <span class="grey">{{bill.date.split("/")[1]}}.{{bill.date.split("/")[0]}}
-                        周{{day(bill.date)}}</span>
-                </div>
-                <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists" right-width="60">
-                    <div class="item" @click="billClickHander(item, bidx, iidx)" :class="{'item-active': currX==bidx && currY==iidx}">
-                        <div class="item-icon">
-                            <img src="~assets/img/edit.svg" alt="">
+
+        <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+            <div class="records">
+                <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad" offset="-100">
+                    <div class="record" v-for="(bill, bidx) in billsIters">
+                        <div class="date">
+                            <span class="bigger">{{bill.date.split("/")[2]}}日 </span>
+                            <span class="grey">{{bill.date.split("/")[1]}}.{{bill.date.split("/")[0]}}
+                                周{{day(bill.date)}}</span>
                         </div>
-                        <div class="item-note">
-                            <div class="bigger">{{item.category.split(" ")[2]}}</div>
-                            <div class="grey">{{item.note}}</div>
-                            <div class="grey">
-                                {{item.time.split(" ")[1].split(":")[0]}}:{{item.time.split(" ")[1].split(":")[1]}}
-                                {{item.account.split(" ")[2]}}</div>
-                        </div>
-                        <div class="item-num">
-                            <span :class="{'inColor':item.isOut==='false'}">{{parseFloat(item.num).toFixed(2)}}</span>
-                        </div>
+                        <van-swipe-cell ref="swipecell" v-for="(item, iidx) in bill.lists" right-width="60">
+                            <div class="item" @click="billClickHander(item, bidx, iidx)"
+                                :class="{'item-active': currX==bidx && currY==iidx}">
+                                <div class="item-icon">
+                                    <img src="~assets/img/edit.svg" alt="">
+                                </div>
+                                <div class="item-note">
+                                    <div class="bigger">{{item.category.split(" ")[2]}}</div>
+                                    <div class="grey">{{item.note}}</div>
+                                    <div class="grey">
+                                        {{item.time.split(" ")[1].split(":")[0]}}:{{item.time.split("
+                                        ")[1].split(":")[1]}}
+                                        {{item.account.split(" ")[2]}}</div>
+                                </div>
+                                <div class="item-num">
+                                    <span
+                                        :class="{'inColor':item.isOut==='false'}">{{parseFloat(item.num).toFixed(2)}}</span>
+                                </div>
+                            </div>
+                            <template #right>
+                                <button class="delbtn" @click="delClickHandler(item)">删 除</button>
+                            </template>
+                        </van-swipe-cell>
                     </div>
-                    <template #right>
-                        <button class="delbtn" @click="delClickHandler(item)">删 除</button>
-                    </template>
-                </van-swipe-cell>
+                </van-list>
             </div>
-        </div>
+        </van-pull-refresh>
 
         <tab-bar></tab-bar>
         <div class="tobill" @click.prevent="btnClickHandler" :class="{'bill-active': billClicked}">记一笔</div>
@@ -65,7 +71,7 @@
     import TabBar from "components/common/tab/TabBar.vue"
     import BillBarItem from "components/content/bill/BillNumber.vue"
     import { Swiper, SwiperItem } from "components/common/swiper/index.js"
-    import { SwipeCell, Dialog } from "vant"
+    import { SwipeCell, Dialog, List, PullRefresh } from "vant"
     import { baseRequest, getBillsRequest } from "../network/request.js"
 
     export default {
@@ -77,6 +83,8 @@
             BillBarItem,
             [SwipeCell.name]: SwipeCell,
             [Dialog.name]: Dialog,
+            [List.name]: List,
+            [PullRefresh.name]: PullRefresh,
         },
 
         data() {
@@ -101,35 +109,42 @@
                 ],
                 bills: [],      // 服务器请求的账单数据
                 outCount: parseFloat(0).toFixed(2),
-                inCount:parseFloat(0).toFixed(2),
+                inCount: parseFloat(0).toFixed(2),
                 currX: -1,
                 currY: -1,
                 billClicked: false,
+                currPage: 0,
+
+                // 上拉加载
+                loading: false,
+                finished: false,
+
+                // 下拉刷新
+                isLoading: false,
             }
         },
 
         computed: {
             // 对bills按日期分类，便于在template中迭代。
-            billsIters(){
+            billsIters() {
                 let dateBills = new Map();
-                // console.log("this.bills", this.bills)
-                this.bills.forEach(obj=>{
+                this.bills.forEach(obj => {
                     let date = obj.time.split(" ")[0];
-                    if(dateBills.has(date)){
+                    if (dateBills.has(date)) {
                         dateBills.get(date).push(obj);
-                    }else{
+                    } else {
                         dateBills.set(date, [obj]);
                     }
                 })
 
                 let res = [];
-                for(let date of dateBills.keys()){
-                    res.push({"date": date, "lists": dateBills.get(date)});
+                for (let date of dateBills.keys()) {
+                    res.push({ "date": date, "lists": dateBills.get(date) });
                 }
                 return res;
-                
+
             },
-      
+
             // 预算结余
             rest() {
                 let res = (parseFloat(this.$store.state.budget) - this.outCount).toFixed(2);
@@ -160,45 +175,56 @@
             }
         },
 
-        inject: ['reload'],                         
+        inject: ['reload'],
 
         created() {
-            this.getBills();
+            // this.getBills();
             this.getOutIn();
         },
 
         methods: {
 
             // 获得账单数据
-            getBills(){
+            getBills() {
                 baseRequest({
                     url: "/getBills",
                     params: {
                         "userid": "1",
+                        "page": this.currPage + 1,
                     }
-                }).then(res=>{
-                    this.bills = res.data;
-                    // console.log(this.bills)
-                })
+                }).then(res => {
+                    if (res.data.length == 0) {
+                        this.finished = true;
+                    } else {
+                        this.bills.push(...res.data);
+                        this.currPage++;
+                    }
+                    console.log(this.bills)
+                }).finally(() => {
+                    setTimeout(() => {
+                        this.bus.$emit("Loading", false);
+                    }, 500);
+                });
+
             },
 
             // 获得本月收入支出数据
-            getOutIn(){
+            getOutIn() {
                 baseRequest({
-                    url:"/getOutIn",
+                    url: "/getOutIn",
                     params: {
                         "isMonth": "true",
                         "userid": "1",
-                        "time": new Date().getFullYear() + "/" + (new Date().getMonth()+1)
+                        "time": new Date().getFullYear() + "/" + (new Date().getMonth() + 1)
                     }
-                }).then(res=>{
-                    this.inCount = parseFloat(res.data.in.reduce((pre, curr)=>{
-                        pre+=curr;
+                }).then(res => {
+                    this.inCount = parseFloat(res.data.in.reduce((pre, curr) => {
+                        pre += curr;
                         return pre;
                     }, 0)).toFixed(2);
 
-                    this.outCount = parseFloat(res.data.out.reduce((pre, curr)=>{
-                        pre+=curr;
+                    this.outCount = parseFloat(res.data.out.reduce((pre, curr) => {
+                        pre += curr;
                         return pre;
                     }, 0)).toFixed(2);
                 })
@@ -254,6 +280,22 @@
                 setTimeout(() => {
                     this.$router.push({ path: "/editing", query: item })
                 }, 200);
+            },
+
+            // 上拉加载
+            onLoad() {
+                // 加载数据
+                this.getBills();
+                this.loading = false;
+            },
+
+            // 下拉刷新
+            onRefresh() {
+                this.reload();
+                // this.$store.dispatch("setMsg", { msg: "刷新成功！" })
+                this.isLoading = false;
+                // setTimeout(() => {
+                // }, 100);
             }
         }
     }
@@ -276,11 +318,6 @@
         margin-left: 10px;
         color: #fff;
     }
-
-    /* #month .text {
-        font-size: 14px;
-        color: #aaa;
-    } */
 
     #month .money {
         font-size: 14px;
@@ -312,7 +349,7 @@
         color: #fff;
     }
 
-    .bill-active{
+    .bill-active {
         background-color: #eed188;
     }
 
@@ -337,7 +374,7 @@
         border-bottom: 1px solid #f6f6f6;
     }
 
-    .item-active{
+    .item-active {
         background-color: #f6f6f6;
     }
 
@@ -409,10 +446,4 @@
         background-color: #222;
         color: #fff;
     }
-
-    
-
-    
-
-
 </style>

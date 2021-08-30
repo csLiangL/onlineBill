@@ -32,9 +32,6 @@
         created() {
             this.rawdata = { ...this.$route.query };
             this.rawdata.time = new Date(this.rawdata.time)
-            // console.log("editing中接收到:", this.rawdata)
-            // this.rawdata.time = dateProcess.toDate(this.rawdata.time)
-            // console.log("editing中:", this.rawdata)
         },
 
         computed: {
@@ -50,9 +47,11 @@
         },
         methods: {
 
+            // 返回按钮
             leftClickHandler() {
                 this.$router.push("/home")
             },
+            // 确定按钮
             rightClickHandler() {
                 this.trys++;
             },

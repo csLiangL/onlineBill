@@ -40,7 +40,7 @@
         </van-datetime-picker>
 
         <van-picker show-toolbar ref="year" class="time-picker" v-show="!isMonth && isYearPickShow"
-            :columns="['2018年', '2019年', '2020年','2021年']" cancel-button-text=" " @change="yearChangeHandler"
+            :columns="['2017年', '2018年', '2019年', '2020年','2021年', '2022年']" cancel-button-text=" " @change="yearChangeHandler"
             @confirm="yearConfirmHandler">
             <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
         </van-picker>
@@ -50,15 +50,11 @@
 </template>
 <script>
     import TabBar from "components/common/tab/TabBar.vue"
-    import LineChart from "components/content/charts/LineChart.vue"
-    import BarChart from "components/content/charts/BarChart.vue"
     import { DatetimePicker, Picker } from 'vant';
     import { baseRequest } from "@/network/request.js"
     export default {
         components: {
             TabBar,
-            LineChart,
-            BarChart,
             [DatetimePicker.name]: DatetimePicker,
             [Picker.name]: Picker,
         },
@@ -71,10 +67,12 @@
                 time: new Date(),                               // 记录当前月份的完整时间
                 year: "" + new Date().getFullYear() + "年",     // 记录当前年份
 
+                // 折线图数据
                 lineChart: null,
                 LineX: [],
                 LineY: [],
 
+                // 饼状图数据
                 barChart: null,
                 barData:[],
             }
@@ -114,6 +112,9 @@
                     this.barData = ret.catIn;
                     this.LineY = ret.in;
                 }
+                setTimeout(() => {
+                    this.bus.$emit("Loading", false);
+                }, 500);
                 this.updateChart();
             },
 
@@ -181,19 +182,30 @@
                 // }
             },
 
+            // 选择了月报
             monthClickHandler() {
                 this.isMonth = true;
                 this.isYearPickShow = false;
             },
 
+            // 选择了年报
+            yearClickHandler() {
+                this.isMonth = false;
+                this.isMonthPickShow = false;
+                console.log(this.$refs.year.setValues([this.year]));
+            },
+            
+            // 选择了支出
             outClickHandler() {
                 this.isOut = true;
             },
 
+            // 选择了收入
             inClickHandler() {
                 this.isOut = false;
             },
 
+            // 点击了时间筛选
             timeClickHandler() {
                 if (this.isMonth) {
                     this.isMonthPickShow = true;
@@ -202,6 +214,8 @@
                 }
             },
 
+
+            // vant组件相关
             formatterHandler(type, val) {
                 if (type === 'year') {
                     return val + '年';
@@ -210,42 +224,31 @@
                     return val + '月';
                 }
             },
-
             dateConfirmHandler() {
                 this.isMonthPickShow = false;
-            },
-
-            yearChangeHandler(picker) {
-                this.year = picker.getValues()[0];
-                // console.log(picker.getValues()[0]);
             },
             yearConfirmHandler() {
                 this.isYearPickShow = false;
             },
-            yearClickHandler() {
-                this.isMonth = false;
-                this.isMonthPickShow = false;
-                console.log(this.$refs.year.setValues([this.year]));
+            yearChangeHandler(picker) {
+                this.year = picker.getValues()[0];
             },
-
+            
         },
 
         watch:{
+
+            // 以下数据改变后需要重新进行getData数据库操作
             time(){
-                // this.isgetData = true;
-                // console.log("time改变了")
                 this.getData();
             },
             year(){
-                // console.log("year改变了")
                 this.getData();
             },
             isOut(){
-                // console.log("isOut改变了")
                 this.getData();
             },
             isMonth(){
-                // console.log("isMonth改变了")
                 this.getData();
             }
         }

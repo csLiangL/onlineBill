@@ -21,17 +21,9 @@
                     <img src="~assets/img/charts-active.svg" alt="" class="image">
                 </template>
             </van-cell>
-            <van-cell title="分类编辑" is-link class="bar-item">
-                <template slot="icon">
-                    <img src="~assets/img/cate.svg" alt="" class="image">
-                </template>
-            </van-cell>
 
             <van-popup v-model="show" class="popup">
                 <div class="popup-title">{{new Date().getMonth()+1}}月预算</div>
-                <!-- <van-field v-model="budget" label="预算" />
-                <van-number-keyboard :show="show" theme="custom" extra-key="." close-button-text="完成"
-                    @blur="show = false" @input="onInput" @delete="onDelete" /> -->
                 <bill-number :amount="budget" @valueSend="valueSendHandler"></bill-number>
             </van-popup>
         </div>
@@ -59,25 +51,12 @@
         },
         created() {
             this.budget = this.$store.state.budget;
-            // // 获得预算数据
-            // baseRequest({
-            //     url: "/getBudget",
-            //     params: {
-            //         userid: "1"
-            //     }
-            // }).then(res => {
-            //     console.log("Profile", res);
-            //     this.budget = res.data.budget;
-            // })
         },
         components: {
             TabBar,
             BillNumber,
             [Popup.name]: Popup,
             [Cell.name]: Cell,
-            // [Icon.name]: Icon,
-            // [Field.name]: Field,
-            // [NumberKeyboard.name]: NumberKeyboard,
         },
         methods: {
             valueSendHandler(data) {
@@ -96,9 +75,12 @@
                     this.budget = data;
                     // 2.再将预算状态传递到Vuex中
                     this.$store.state.budget = data;
-                    console.log("修改成功")
                 }).catch(err => {
                     console.log("修改失败")
+                }).finally(() => {
+                    setTimeout(() => {
+                        this.bus.$emit("Loading", false);
+                    }, 500);
                 })
             }
         }

@@ -10,11 +10,6 @@
             <img slot="item-icon-active" src="~assets/img/charts-active.svg" alt="">
             <span slot="item-text">图表</span>
         </tab-bar-item>
-        <!-- <tab-bar-item path='/news'>
-            <img slot="item-icon" src="~assets/img/news.svg" alt="">
-            <img slot="item-icon-active" src="~assets/img/news-active.svg" alt="">
-            <span slot="item-text">资讯</span>
-        </tab-bar-item> -->
         <tab-bar-item path='/profile'>
             <img slot="item-icon" src="~assets/img/profile.svg" alt="">
             <img slot="item-icon-active" src="~assets/img/profile-active.svg" alt="">

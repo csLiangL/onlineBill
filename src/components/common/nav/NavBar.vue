@@ -51,7 +51,6 @@
         vertical-align: middle;
     }
 
-
     .nav-bar .center {
         flex: 5;
         /* background-color: red; */

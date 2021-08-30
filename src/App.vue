@@ -5,6 +5,7 @@
     <!-- 被激活的路由将显示在这里, exclude中的组件名保持和.vue文件中的一致，而不是和路由一致。 -->
     <!-- <keep-alive exclude=> -->
     <router-view v-if="isRouterAlive" />
+    <loading></loading>
     <!-- </keep-alive> -->
   </div>
 </template>
@@ -12,7 +13,12 @@
 <script>
 
   import { baseRequest } from "./network/request.js"
+  import Loading from "components/common/loading/Loading.vue"
+
   export default {
+    components: {
+      Loading,
+    },
     data() {
       return {
         isRouterAlive: true,
@@ -31,9 +37,8 @@
           userid: "1"
         }
       }).then(res => {
-        // let budget = !res.data.budget ? "0.00" : res.data.budget;
         let budget = res.data.budget;
-        this.$store.commit("setBudget", { "budget": budget })
+        this.$store.commit("setBudget", { "budget": budget });
       })
     },
     methods: {

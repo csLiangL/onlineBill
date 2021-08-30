@@ -19,7 +19,6 @@
             <div class="out" @click="billoutClickHandle" :class="{'active': outActive}">支出</div>
             <div class="in" @click="billInClickHandle" :class="{'active': inActive}">收入</div>
         </div>
-        <!-- <bill-bar v-if="outActive" :isSendData="isSubmitting" @getData="getDataHandler"></bill-bar> -->
         <bill-bar :isOut="outActive" :trys="trys" @getData="getDataHandler">
         </bill-bar>
 
@@ -35,7 +34,6 @@
     import NavBar from "components/common/nav/NavBar.vue"
     import BillBar from "components/content/bill/BillBar.vue"
     import { baseRequest } from "../network/request.js"
-    import { dateProcess } from "../commonFun.js"
 
     export default {
         data() {
@@ -76,17 +74,6 @@
             //      2.1 成功则跳转到/home页面, 并展示"成功提示"。
             //      2.2 失败则停留在此页面，并展示"失败提示"
             getDataHandler(data) {
-
-                // Date.prototype.toJSON = function () {
-                //     let year = this.getFullYear();
-                //     let month = this.getMonth() + 1 < 10 ? "0" + (this.getMonth() + 1) : this.getMonth() + 1;
-                //     let date = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
-                //     let hour = this.getHours() < 10 ? "0" + this.getHours() : this.getHours();
-                //     let min = this.getMinutes() < 10 ? "0" + this.getMinutes() : this.getMinutes();
-                //     return year + "-" + month + "-" + date + " " + hour + ":" + min;
-                // }
-                // data.time = data.time.toJSON();
-                // data.num = data.num === "" ? 0 : data.num;
                 baseRequest({
                     url: "/saveBill",
                     params: { ...data, "userid": "1" }

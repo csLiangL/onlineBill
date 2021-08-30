@@ -9,6 +9,10 @@ Vue.prototype.$echarts = window.echarts;
 
 Vue.config.productionTip = false
 
+const bus = new Vue();
+export default bus;
+Vue.prototype.bus = bus;
+
 new Vue({
   router,
   store,
