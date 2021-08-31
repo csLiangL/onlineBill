@@ -22,13 +22,13 @@
 
 
         <div class="chart">
-            <div class="chart-title">支出趋势</div>
+            <div class="chart-title">{{isOutTextShow}}趋势</div>
             <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
             <div class="chart-container" ref="line_chart"></div>
         </div>
         
         <div class="chart">
-            <div class="chart-title">分类排行</div>
+            <div class="chart-title">{{isOutTextShow}}分类排行</div>
             <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
             <div class="chart-container" ref="bar_chart"></div>
         </div>
@@ -78,6 +78,9 @@
             }
         },
         computed: {
+            isOutTextShow(){
+                return this.isOut? "支出": "收入";
+            },
             timeShow() {
                 let month = this.time.getMonth() + 1 < 10 ? "0" + (this.time.getMonth() + 1) : this.time.getMonth() + 1;
                 let date = this.time.getDate() < 10 ? "0" + this.time.getDate() : this.time.getDate();
