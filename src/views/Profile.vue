@@ -50,7 +50,11 @@
             }
         },
         created() {
-            this.budget = this.$store.state.budget;
+            // 在App.vue中从数据库取得预算，然后存入vuex中。
+            // 上面这个过程需要时间，因此等待0.2s后，再从vuex中取数据，作为初始化的数据。
+            setTimeout(() => {
+                this.budget = this.$store.state.budget;
+            }, 200);
         },
         components: {
             TabBar,

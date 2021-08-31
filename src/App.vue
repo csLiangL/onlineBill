@@ -37,8 +37,13 @@
           userid: "1"
         }
       }).then(res => {
+        // let budget = res.data.budget ? res.data.budget : 1000;
         let budget = res.data.budget;
         this.$store.commit("setBudget", { "budget": budget });
+      }).finally(()=>{
+        setTimeout(() => {
+          this.bus.$emit("Loading", false);
+        }, 200);
       })
     },
     methods: {

@@ -28,7 +28,7 @@
         </div>
         
         <div class="chart">
-            <div class="chart-title">分类支出排行</div>
+            <div class="chart-title">分类排行</div>
             <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
             <div class="chart-container" ref="bar_chart"></div>
         </div>
