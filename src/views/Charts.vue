@@ -26,7 +26,7 @@
             <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
             <div class="chart-container" ref="line_chart"></div>
         </div>
-        
+
         <div class="chart">
             <div class="chart-title">{{isOutTextShow}}分类排行</div>
             <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
@@ -40,8 +40,8 @@
         </van-datetime-picker>
 
         <van-picker show-toolbar ref="year" class="time-picker" v-show="!isMonth && isYearPickShow"
-            :columns="['2017年', '2018年', '2019年', '2020年','2021年', '2022年']" cancel-button-text=" " @change="yearChangeHandler"
-            @confirm="yearConfirmHandler">
+            :columns="['2017年', '2018年', '2019年', '2020年','2021年', '2022年']" cancel-button-text=" "
+            @change="yearChangeHandler" @confirm="yearConfirmHandler">
             <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
         </van-picker>
 
@@ -74,12 +74,12 @@
 
                 // 饼状图数据
                 barChart: null,
-                barData:[],
+                barData: [],
             }
         },
         computed: {
-            isOutTextShow(){
-                return this.isOut? "支出": "收入";
+            isOutTextShow() {
+                return this.isOut ? "支出" : "收入";
             },
             timeShow() {
                 let month = this.time.getMonth() + 1 < 10 ? "0" + (this.time.getMonth() + 1) : this.time.getMonth() + 1;
@@ -142,7 +142,7 @@
                         data: this.LineY,
                         type: 'line',
                         smooth: true,
-                        itemStyle:{
+                        itemStyle: {
                             color: "#DAA520"
                         },
                     }]
@@ -180,8 +180,8 @@
                 // if(this.barData.length!=0){
                 //     let lineChart = this.$echarts.init(this.$refs.line_chart);
                 //     let barChart = this.$echarts.init(this.$refs.bar_chart);
-                    this.lineChart.setOption(line_option);
-                    this.barChart.setOption(bar_option);
+                this.lineChart.setOption(line_option);
+                this.barChart.setOption(bar_option);
                 // }
             },
 
@@ -197,7 +197,7 @@
                 this.isMonthPickShow = false;
                 console.log(this.$refs.year.setValues([this.year]));
             },
-            
+
             // 选择了支出
             outClickHandler() {
                 this.isOut = true;
@@ -236,22 +236,22 @@
             yearChangeHandler(picker) {
                 this.year = picker.getValues()[0];
             },
-            
+
         },
 
-        watch:{
+        watch: {
 
             // 以下数据改变后需要重新进行getData数据库操作
-            time(){
+            time() {
                 this.getData();
             },
-            year(){
+            year() {
                 this.getData();
             },
-            isOut(){
+            isOut() {
                 this.getData();
             },
-            isMonth(){
+            isMonth() {
                 this.getData();
             }
         }
@@ -335,9 +335,11 @@
     }
 
     .time-picker {
-        width: 100%;
         position: fixed;
         bottom: 50px;
+        left: 0;
+        right: 0;
+        box-shadow: 0 1px 5px 1px rgba(0, 0, 0, .2);
     }
 
     .time-picker .pulldown {
@@ -349,7 +351,7 @@
         height: 300px;
     }
 
-    .nothing{
+    .nothing {
         color: #666;
         font-size: larger;
         text-align: center;
