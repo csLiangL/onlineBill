@@ -31,7 +31,7 @@
 
 <style>
     #loading {
-        position: absolute;
+        position: fixed;
         display: flex;
         top: 0;
         bottom: 0;
