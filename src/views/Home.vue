@@ -58,7 +58,7 @@
             </div>
         </van-pull-refresh>
 
-        <tab-bar></tab-bar>
+        <!-- <tab-bar></tab-bar> -->
         <div class="tobill" @click.prevent="btnClickHandler" :class="{'bill-active': billClicked}">记一笔</div>
 
         <!-- 消息的展示 -->

@@ -4,6 +4,9 @@
     <!-- 记账页面不要保留缓存，因为记账不需要保留记录，需要的是实时更新日期。 -->
     <!-- 被激活的路由将显示在这里, exclude中的组件名保持和.vue文件中的一致，而不是和路由一致。 -->
     <!-- <keep-alive exclude=> -->
+
+    <!-- tab-bar放在App内，意味着只要匹配到router中的路由，就会tab-bar就会显示。 -->
+    <tab-bar></tab-bar>
     <router-view v-if="isRouterAlive" />
     <loading></loading>
     <!-- </keep-alive> -->
@@ -14,9 +17,11 @@
 
   import { baseRequest } from "./network/request.js"
   import Loading from "components/common/loading/Loading.vue"
+  import TabBar from "components/common/tab/TabBar.vue"
 
   export default {
     components: {
+      TabBar,
       Loading,
     },
     data() {
@@ -40,7 +45,7 @@
         // let budget = res.data.budget ? res.data.budget : 1000;
         let budget = res.data.budget;
         this.$store.commit("setBudget", { "budget": budget });
-      }).finally(()=>{
+      }).finally(() => {
         setTimeout(() => {
           this.bus.$emit("Loading", false);
         }, 200);

@@ -12,21 +12,13 @@
 <script>
     export default {
         props: {
+            // 每个组件都存着自身的path, 需要与 当前路由 this.$route 比较。
             path: String,
             activeColor: {
                 type: String,
                 default: "#04BE02"
             }
         },
-        // isActive依赖于变量$router。
-        // activeStyle依赖于变量isActive。
-        // data() {
-        //     return {
-        //         // isActive: this.$route.path == this.path,
-        //         // activeStyle: this.isActive ? { color: this.activeColor } : {}
-        //         // activeStyle: { color: this.activeColor }
-        //     }
-        // },
         computed: {
             isActive() {
                 return this.$route.path.indexOf(this.path) != -1;
