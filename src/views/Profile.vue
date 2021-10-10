@@ -27,7 +27,6 @@
                 <bill-number :amount="budget" @valueSend="valueSendHandler"></bill-number>
             </van-popup>
         </div>
-        <!-- <tab-bar></tab-bar> -->
     </div>
 </template>
 <script>

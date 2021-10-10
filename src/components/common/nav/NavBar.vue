@@ -1,7 +1,7 @@
 <template>
     <!-- 上部导航栏在一个项目中可能有多个 -->
     <div class="nav-bar">
-        <div class="left" @click="navLeftClickHandler">
+        <div class="left">
             <slot name="left"></slot>
         </div>
         <div class="center">
@@ -13,16 +13,6 @@
     </div>
 </template>
 <script>
-    export default {
-        props: {
-            fromPath: String
-        },
-        methods: {
-            navLeftClickHandler() {
-                this.$router.push(this.fromPath)
-            }
-        }
-    }
 </script>
 <style>
     /* 上部导航高度：50px */

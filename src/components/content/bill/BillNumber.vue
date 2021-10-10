@@ -1,8 +1,6 @@
 <template>
     <div class="bill-number">
-        <!-- <input type="text" :value="valueShow" :style="{borderBottomWidth: borderBottomWidth}"
-            @click="inputClickHandler"> -->
-        <div class="num-input" :style="{borderBottomWidth: borderBottomWidth}" @click="inputClickHandler">
+        <div class="num-input" :style="{borderBottomWidth: borderBottomWidth, color: color}" @click="inputClickHandler">
             {{valueShow}}
         </div>
         <van-number-keyboard :show="numBarShow" theme="custom" extra-key="." close-button-text="完成" @blur="blurHandler"
@@ -12,8 +10,19 @@
 <script>
     import { NumberKeyboard } from 'vant';
     export default {
+        components: {
+            [NumberKeyboard.name]: NumberKeyboard
+        },
         props: {
+            // amount: {
+            //     type: String,
+            //     default: "",
+            // },
             amount: "",
+            color: {
+                type: String,
+                default: "#04BE02",
+            }
         },
         data() {
             return {
@@ -25,26 +34,25 @@
         },
         computed: {
             valueShow() {
+                // return typeof this.value == "undefined" || this.value == "" ? "0.00" : parseFloat(this.value).toFixed(2);
                 return this.value == "" ? "0.00" : parseFloat(this.value).toFixed(2);
             }
         },
-        components: {
-            [NumberKeyboard.name]: NumberKeyboard
-        },
+
         methods: {
             inputClickHandler() {
                 this.numBarShow = true;
                 this.borderBottomWidth = "2px";
-                this.$emit("billNumClick");
             },
             blurHandler() {
-                console.log("blur被触发了")
                 this.numBarShow = false;
                 this.borderBottomWidth = "1px";
             },
+            // 键盘点击"完成"
             closeHandler() {
                 this.$emit("valueSend", this.value)
             },
+
             // van-number-keyboard组件一旦进行数据双向绑定(v-model)后, 则按照组件内部实现的onDelete方法来更新数据。此时使用onDelete无效。
             // 需要解除双向绑定，然后手写OnInput和onDelete方法。
             onInput(key) {
@@ -67,6 +75,7 @@
                     // 整数(防止输入为00000)
                     this.value = parseInt(this.value) + "";
                 }
+                this.valChange(this.value);
             },
             onDelete() {
                 if (this.value[this.value.length - 1] == ".") {
@@ -74,14 +83,15 @@
                 } else {
                     this.value = this.value.slice(0, this.value.length - 1);
                 }
+                this.valChange(this.value);
             },
-        },
-        watch: {
-            value(newv, oldv) {
-                console.log(newv, oldv)
-            }
-        }
 
+            // 数值发生改变时触发。
+            valChange(newVal) {
+                console.log("BillNumber", newVal);
+                this.$emit("numChange", newVal);
+            }
+        },
     }
 </script>
 <style>
@@ -98,9 +108,8 @@
         border: 0 transparent;
         width: 100%;
         font-size: 40px;
-        color: #04BE02;
         caret-color: transparent;
-        border-bottom: 1px solid #04BE02;
+        border-bottom: 1px solid;
         text-align: left;
     }
 </style>

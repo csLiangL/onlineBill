@@ -45,7 +45,6 @@
             <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
         </van-picker>
 
-        <!-- <tab-bar></tab-bar> -->
     </div>
 </template>
 <script>

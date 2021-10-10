@@ -19,6 +19,7 @@
             <div class="out" @click="billoutClickHandle" :class="{'active': outActive}">支出</div>
             <div class="in" @click="billInClickHandle" :class="{'active': inActive}">收入</div>
         </div>
+
         <bill-bar :isOut="outActive" :trys="trys" @getData="getDataHandler">
         </bill-bar>
 
