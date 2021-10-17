@@ -23,7 +23,7 @@ const routes = [
   {
     path: '/charts',
     name: 'charts',
-    component: () => import("views/Chart.vue"),
+    component: () => import("views/Charts.vue"),
 
   },
   {

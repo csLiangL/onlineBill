@@ -20,17 +20,17 @@
             </div>
         </div>
 
-
         <div class="chart">
             <div class="chart-title">{{isOutTextShow}}趋势</div>
-            <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
-            <div class="chart-container" ref="line_chart"></div>
+            <div class="nothing" v-if="pie_data.length==0">该时段没有记账哟</div>
+            <line-chart class="chart-cpn" v-else :xData="line_xData" :yData="line_yData" ></line-chart>
         </div>
 
         <div class="chart">
             <div class="chart-title">{{isOutTextShow}}分类排行</div>
-            <div class="nothing" v-if="barData.length==0">该时段没有记账哟</div>
-            <div class="chart-container" ref="bar_chart"></div>
+            <div class="nothing" v-if="pie_data.length==0">该时段没有记账哟</div>
+            <pie-chart class="chart-cpn"  v-else :catData="pie_data"></pie-chart>
+
         </div>
 
         <van-datetime-picker class="time-picker" v-model="time" type="year-month" v-show="isMonth&&isMonthPickShow"
@@ -40,7 +40,7 @@
         </van-datetime-picker>
 
         <van-picker show-toolbar ref="year" class="time-picker" v-show="!isMonth && isYearPickShow"
-            :columns="['2017年', '2018年', '2019年', '2020年','2021年', '2022年']" cancel-button-text=" "
+            :columns="['2017年', '2018年', '2019年', '2020年','2021年', '2022年', '2023年']" cancel-button-text=" "
             @change="yearChangeHandler" @confirm="yearConfirmHandler">
             <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
         </van-picker>
@@ -49,11 +49,16 @@
 </template>
 <script>
     import TabBar from "components/common/tab/TabBar.vue"
+    import LineChart from "components/content/charts/LineChart.vue"
+    import PieChart from "components/content/charts/PieChart.vue"
+
     import { DatetimePicker, Picker } from 'vant';
     import { baseRequest } from "@/network/request.js"
     export default {
         components: {
             TabBar,
+            LineChart,
+            PieChart,
             [DatetimePicker.name]: DatetimePicker,
             [Picker.name]: Picker,
         },
@@ -61,19 +66,18 @@
             return {
                 isMonth: true,
                 isOut: true,
-                isMonthPickShow: false,
-                isYearPickShow: false,
                 time: new Date(),                               // 记录当前月份的完整时间
                 year: "" + new Date().getFullYear() + "年",     // 记录当前年份
+                isMonthPickShow: false,
+                isYearPickShow: false,
 
                 // 折线图数据
-                lineChart: null,
-                LineX: [],
-                LineY: [],
+                line_xData: [],
+                line_yData: [],
 
                 // 饼状图数据
-                barChart: null,
-                barData: [],
+                pie_data: [],
+
             }
         },
         computed: {
@@ -91,97 +95,27 @@
         },
 
         mounted() {
-            this.initChart();
             this.getData();
         },
 
         methods: {
-            initChart() {
-                this.lineChart = this.$echarts.init(this.$refs.line_chart);
-                this.barChart = this.$echarts.init(this.$refs.bar_chart);
-            },
 
             async getData() {
+                console.log("开始请求数据");
                 const { data: ret } = await baseRequest({
                     url: "/getOutIn",
                     params: { "userid": 1, "time": this.queryTime, "isMonth": this.isMonth }
                 })
-                this.LineX = ret.title;
+                this.line_xData = ret.title;
                 if (this.isOut) {
-                    this.LineY = ret.out;
-                    this.barData = ret.catOut;
+                    this.line_yData = ret.out;
+                    this.pie_data = ret.catOut;
+                    
                 } else {
-                    this.barData = ret.catIn;
-                    this.LineY = ret.in;
+                    this.line_yData = ret.in;
+                    this.pie_data = ret.catIn;
                 }
-                setTimeout(() => {
-                    this.bus.$emit("Loading", false);
-                }, 500);
-                this.updateChart();
-            },
-
-            updateChart() {
-                const line_option = {
-                    grid: {
-                        left: "18%",
-                    },
-
-                    tooltip: {
-                        trigger: 'axis'
-                    },
-
-                    xAxis: {
-                        type: 'category',
-                        data: this.LineX,
-                    },
-                    yAxis: {
-                        type: 'value'
-                    },
-                    series: [{
-                        data: this.LineY,
-                        type: 'line',
-                        smooth: true,
-                        itemStyle: {
-                            color: "#DAA520"
-                        },
-                    }]
-                };
-
-                // 更新bar_chart
-                const bar_option = {
-                    tooltip: {
-                        trigger: 'item'
-                    },
-                    series: [
-                        {
-                            type: 'pie',
-                            radius: ["40%", "70%"],
-                            center: ['50%', '50%'],
-                            data: this.barData.sort(function (a, b) { return a.value - b.value; }),
-                            // roseType: 'area',
-                            label: {
-                                color: 'rgba(0, 0, 0, 0.5)'
-                            },
-                            labelLine: {
-                                lineStyle: {
-                                    color: 'rgba(0, 0, 0, 0.5)'
-                                },
-                                smooth: 0.2,
-                                length: 10,
-                                length2: 20
-                            },
-                            itemStyle: {
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            },
-                        }
-                    ]
-                }
-                // if(this.barData.length!=0){
-                //     let lineChart = this.$echarts.init(this.$refs.line_chart);
-                //     let barChart = this.$echarts.init(this.$refs.bar_chart);
-                this.lineChart.setOption(line_option);
-                this.barChart.setOption(bar_option);
-                // }
+                console.log("数据请求完毕");
             },
 
             // 选择了月报
@@ -194,7 +128,6 @@
             yearClickHandler() {
                 this.isMonth = false;
                 this.isMonthPickShow = false;
-                console.log(this.$refs.year.setValues([this.year]));
             },
 
             // 选择了支出
@@ -242,15 +175,19 @@
 
             // 以下数据改变后需要重新进行getData数据库操作
             time() {
+                console.log("time");
                 this.getData();
             },
             year() {
+                console.log("year");
                 this.getData();
             },
             isOut() {
+                console.log("isOut");
                 this.getData();
             },
             isMonth() {
+                console.log("isMonth");
                 this.getData();
             }
         }
@@ -298,16 +235,17 @@
         padding: 0 10px;
     }
 
-    .pulldown {
-        height: 12px;
-        vertical-align: middle;
-    }
-
     .option .option-out,
     .option .option-in {
         float: right;
         margin-right: 20px;
     }
+
+    .pulldown {
+        height: 12px;
+        vertical-align: middle;
+    }
+
 
     .option span {
         border-radius: 10px;
@@ -345,9 +283,11 @@
         height: 16px;
     }
 
-    .chart-container {
-        width: 100%;
+    .chart-cpn {
+        width: 90%;
         height: 300px;
+        margin: 0 auto;
+
     }
 
     .nothing {

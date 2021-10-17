@@ -80,10 +80,6 @@
                     this.$store.state.budget = data;
                 }).catch(err => {
                     console.log("修改失败")
-                }).finally(() => {
-                    setTimeout(() => {
-                        this.bus.$emit("Loading", false);
-                    }, 500);
                 })
             }
         }

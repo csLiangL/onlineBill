@@ -1,5 +1,3 @@
-<!-- echarts图表需要一个容器: chart-container -->
-
 <template>
     <div class="chart-line" ref="line"></div>
 </template>
@@ -23,8 +21,9 @@
             }
         },
         mounted() {
+            console.log("mounted中初始化图表", this.xData);
             this.initChart();
-            // this.updateChart();
+            console.log("mounted初始化图表后", this.xData);
         },
         methods: {
             // 初始化图表
@@ -60,12 +59,12 @@
 
         watch: {
             xData(newVal, oldVal) {
+                console.log("watch到xData改变了", "newVal", newVal, "oldVal", oldVal);
                 this.updateChart();
             },
             yData(newVal, oldVal) {
                 this.updateChart();
             }
-
         }
     }
 </script>

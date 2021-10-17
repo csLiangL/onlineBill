@@ -200,11 +200,7 @@
                         this.currPage++;
                     }
                     this.loading = false;
-                }).finally(() => {
-                    setTimeout(() => {
-                        this.bus.$emit("Loading", false);
-                    }, 500);
-                });
+                })
 
             },
 
