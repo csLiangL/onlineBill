@@ -3,6 +3,8 @@ import VueRouter from 'vue-router'
 
 
 Vue.use(VueRouter)
+
+// 路由push报错 处理
 const orginPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function (location) {
   return orginPush.call(this, location).catch(error => error);
@@ -21,7 +23,7 @@ const routes = [
   {
     path: '/charts',
     name: 'charts',
-    component: () => import("views/Charts.vue"),
+    component: () => import("views/Chart.vue"),
 
   },
   {
