@@ -34,6 +34,9 @@
             // 更新图表
             updateChart() {
                 const option = {
+                    grid: {
+                        left: "18%",
+                    },
                     tooltip: {
                         trigger: 'axis'
                     },

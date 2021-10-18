@@ -95,7 +95,6 @@
         height: 100px;
         display: flex;
         align-items: center;
-        /* border-bottom: 1px solid red; */
         margin-bottom: 10px;
         background-color: #DAA520;
     }
@@ -142,9 +141,4 @@
         padding-top: 20px;
         font-size: 18px;
     }
-
-    /* .inputBudget {
-        border: 0px;
-        border-bottom: 1px solid #666;
-    } */
 </style>

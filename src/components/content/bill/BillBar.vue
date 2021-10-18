@@ -313,15 +313,15 @@
                     // 对日期进行处理
                     // 发送网络请求时，会调用toJSON方法 将Date类型转换为JSON类型(转为UTC格式,滞后北京8小时)
                     // 重写toJSON方法: 将Date类型转为 2021/08/07 07:05:01
-                    Date.prototype.toJSON = function () {
-                        let year = this.getFullYear();
-                        let month = this.getMonth() + 1 < 10 ? "0" + (this.getMonth() + 1) : this.getMonth() + 1;
-                        let date = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
-                        let hour = this.getHours() < 10 ? "0" + this.getHours() : this.getHours();
-                        let min = this.getMinutes() < 10 ? "0" + this.getMinutes() : this.getMinutes();
-                        return year + "/" + month + "/" + date + " " + hour + ":" + min;
-                    }
-                    let timeJSON = this.time.toJSON();
+                    // Date.prototype.toJSON = function () {
+                    //     let year = this.getFullYear();
+                    //     let month = this.getMonth() + 1 < 10 ? "0" + (this.getMonth() + 1) : this.getMonth() + 1;
+                    //     let date = this.getDate() < 10 ? "0" + this.getDate() : this.getDate();
+                    //     let hour = this.getHours() < 10 ? "0" + this.getHours() : this.getHours();
+                    //     let min = this.getMinutes() < 10 ? "0" + this.getMinutes() : this.getMinutes();
+                    //     return year + "/" + month + "/" + date + " " + hour + ":" + min;
+                    // }
+                    // let timeJSON = this.time.toJSON();
                     // 对记账数据进行处理
                     let numJSON = this.num == "" ? 0 : this.num;
                     // 传进来的记账金额，要在预算中加上这部分。
@@ -329,7 +329,7 @@
 
                     // 编辑支出 且 预算不够 且 remind==true
                     let rest = parseFloat(this.$store.state.rest) + parseFloat(preNum) - parseFloat(this.num);
-                    console.log(this.isOut)
+
                     if (this.isOut && rest < 0 && this.remind) {
                         this.$dialog.confirm({
                             message: '您本月预算不够了！',

@@ -6,7 +6,7 @@
     <!-- <keep-alive exclude=> -->
 
     <!-- tab-bar放在App内，意味着只要匹配到router中的路由，就会tab-bar就会显示。 -->
-    <tab-bar></tab-bar>
+    <tab-bar v-if="$route.path!=='/billing' && $route.path!=='/editing'"></tab-bar>
     <router-view v-if="isRouterAlive" />
     <loading></loading>
     <!-- </keep-alive> -->

@@ -23,13 +23,13 @@
         <div class="chart">
             <div class="chart-title">{{isOutTextShow}}趋势</div>
             <div class="nothing" v-if="pie_data.length==0">该时段没有记账哟</div>
-            <line-chart class="chart-cpn" v-else :xData="line_xData" :yData="line_yData" ></line-chart>
+            <line-chart class="chart-cpn" v-else :xData="line_xData" :yData="line_yData"></line-chart>
         </div>
 
         <div class="chart">
             <div class="chart-title">{{isOutTextShow}}分类排行</div>
             <div class="nothing" v-if="pie_data.length==0">该时段没有记账哟</div>
-            <pie-chart class="chart-cpn"  v-else :catData="pie_data"></pie-chart>
+            <pie-chart class="chart-cpn" v-else :catData="pie_data"></pie-chart>
 
         </div>
 
@@ -39,9 +39,8 @@
             <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
         </van-datetime-picker>
 
-        <van-picker show-toolbar ref="year" class="time-picker" v-show="!isMonth && isYearPickShow"
-            :columns="['2017年', '2018年', '2019年', '2020年','2021年', '2022年', '2023年']" cancel-button-text=" "
-            @change="yearChangeHandler" @confirm="yearConfirmHandler">
+        <van-picker show-toolbar :default-index="yearIdx" class="time-picker" v-show="!isMonth && isYearPickShow"
+            :columns="columns" cancel-button-text=" " @change="yearChangeHandler" @confirm="yearConfirmHandler">
             <img class="pulldown" slot="confirm" src="~assets/img/pulldown.svg" alt="">
         </van-picker>
 
@@ -66,29 +65,38 @@
             return {
                 isMonth: true,
                 isOut: true,
-                time: new Date(),                               // 记录当前月份的完整时间
+                time: new Date(),                               // 与vant组件绑定
                 year: "" + new Date().getFullYear() + "年",     // 记录当前年份
                 isMonthPickShow: false,
                 isYearPickShow: false,
 
+                columns: ['2017年', '2018年', '2019年', '2020年', '2021年', '2022年', '2023年'],
+
+                ret: null,
                 // 折线图数据
                 line_xData: [],
                 line_yData: [],
 
                 // 饼状图数据
                 pie_data: [],
-
             }
         },
         computed: {
             isOutTextShow() {
                 return this.isOut ? "支出" : "收入";
             },
+
+            // 显示的值随着年份而变化。
+            yearIdx() {
+                return this.columns.indexOf(this.year);
+            },
+
             timeShow() {
                 let month = this.time.getMonth() + 1 < 10 ? "0" + (this.time.getMonth() + 1) : this.time.getMonth() + 1;
                 let date = this.time.getDate() < 10 ? "0" + this.time.getDate() : this.time.getDate();
                 return this.time.getFullYear() + "/" + month;
             },
+
             queryTime() {
                 return this.isMonth ? this.timeShow : this.year.split("年")[0];
             }
@@ -106,16 +114,21 @@
                     url: "/getOutIn",
                     params: { "userid": 1, "time": this.queryTime, "isMonth": this.isMonth }
                 })
+                this.ret = ret;
                 this.line_xData = ret.title;
-                if (this.isOut) {
+                this.setInOrOut(this.ret, this.isOut);
+                console.log("数据请求完毕");
+            },
+
+
+            setInOrOut(ret, isOut) {
+                if (isOut) {
                     this.line_yData = ret.out;
                     this.pie_data = ret.catOut;
-                    
                 } else {
                     this.line_yData = ret.in;
                     this.pie_data = ret.catIn;
                 }
-                console.log("数据请求完毕");
             },
 
             // 选择了月报
@@ -168,7 +181,6 @@
             yearChangeHandler(picker) {
                 this.year = picker.getValues()[0];
             },
-
         },
 
         watch: {
@@ -184,12 +196,12 @@
             },
             isOut() {
                 console.log("isOut");
-                this.getData();
+                this.setInOrOut(this.ret, this.isOut);
             },
             isMonth() {
                 console.log("isMonth");
                 this.getData();
-            }
+            },
         }
     }
 </script>
@@ -284,10 +296,9 @@
     }
 
     .chart-cpn {
-        width: 90%;
+        width: 100%;
         height: 300px;
         margin: 0 auto;
-
     }
 
     .nothing {

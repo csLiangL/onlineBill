@@ -1,5 +1,6 @@
 <template>
-    <div class="chart-pie" ref="pie"></div>
+    <div class="chart-pie" ref="pie">
+    </div>
 </template>
 
 <script>
@@ -70,10 +71,12 @@
                 this.updateChart();
             }
         }
-
     }
 </script>
 
 <style>
-
+    .chart-pie {
+        width: 100%;
+        height: 100%;
+    }
 </style>
