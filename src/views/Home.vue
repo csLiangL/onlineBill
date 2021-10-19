@@ -1,5 +1,5 @@
 <template>
-    <div id="home">
+    <div id="home" v-cloak>
         <swiper>
             <swiper-item v-for="item in banners">
                 <a :href="item.link">
@@ -9,7 +9,6 @@
         </swiper>
 
         <div id="month">
-            <!-- <div class="large text">{{new Date().getMonth()+1}}月</div> -->
             <div>
                 <span class="large">{{new Date().getMonth()+1}}</span>
                 <span class="grey"> 月 · 预算结余</span>
@@ -19,7 +18,6 @@
             <span class="money">{{inCount}}</span>
             <span class="grey"> | 支出 </span><span class="money">{{outCount}}</span>
         </div>
-
 
         <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
             <div class="records">
@@ -110,6 +108,8 @@
                 bills: [],      // 服务器请求的账单数据
                 outCount: parseFloat(0).toFixed(2),
                 inCount: parseFloat(0).toFixed(2),
+
+                // 记录当前点击的是哪笔账单
                 currX: -1,
                 currY: -1,
                 billClicked: false,
@@ -141,8 +141,8 @@
                 for (let date of dateBills.keys()) {
                     res.push({ "date": date, "lists": dateBills.get(date) });
                 }
+                console.log(res);
                 return res;
-
             },
 
             // 预算结余
@@ -175,11 +175,11 @@
             }
         },
 
-        inject: ['reload'],
+        // inject: ['reload'],
 
         created() {
-            // this.getBills();
             this.getOutIn();
+            // 滚动条<100自动触发onLoad, 去服务端获取数据。
         },
 
         methods: {
@@ -199,7 +199,7 @@
                         this.bills.push(...res.data);
                         this.currPage++;
                     }
-                    this.loading = false;
+                    this.loading = false;           // 自动结束 上拉加载 的状态。
                 })
 
             },
@@ -231,8 +231,6 @@
                 this.billClicked = true;
                 setTimeout(() => {
                     this.billClicked = false;
-                }, 100);
-                setTimeout(() => {
                     this.$router.push("/billing")
                 }, 200);
             },
@@ -244,11 +242,6 @@
                 this.$dialog.confirm({
                     message: '确定删除该笔账单吗？',
                 }).then((confirm) => {          // 点击确认
-                    // 1.删除本地的数据
-                    // this.bills[bidx].lists.splice(iidx, 1);
-                    // if (this.bills[bidx].lists.length == 0) {
-                    //     this.bills.splice(bidx, 1)
-                    // }
                     // 删除数据库中的数据, 并重新刷新页面
                     baseRequest({
                         url: "/delBill",
@@ -272,8 +265,6 @@
                 setTimeout(() => {
                     this.currX = -1;
                     this.currY = -1;
-                }, 100);
-                setTimeout(() => {
                     this.$router.push({ path: "/editing", query: item })
                 }, 200);
             },
@@ -282,16 +273,13 @@
             onLoad() {
                 // 加载数据
                 this.getBills();
-                // this.loading = false;
             },
 
             // 下拉刷新
             onRefresh() {
-                this.reload();
-                // this.$store.dispatch("setMsg", { msg: "刷新成功！" })
+                // this.reload();
+                this.$parent.reload();
                 this.isLoading = false;
-                // setTimeout(() => {
-                // }, 100);
             }
         }
     }
@@ -302,6 +290,10 @@
     #home {
         background-color: #f6f6f6;
         box-sizing: border-box;
+    }
+
+    [v-cloak] {
+        display: none;
     }
 
     #month {
@@ -365,7 +357,6 @@
     .item {
         display: flex;
         align-items: center;
-        justify-items: center;
         padding: 8px 0;
         border-bottom: 1px solid #f6f6f6;
     }
@@ -381,16 +372,17 @@
 
     .item .item-note {
         flex: 5;
+        word-break: break-all;
     }
 
     .item .item-num {
         flex: 2;
         color: #04BE02;
-        margin-right: 10px;
     }
 
     .item .item-num span {
         float: right;
+        margin-right: 10px;
     }
 
     .item .item-icon img {

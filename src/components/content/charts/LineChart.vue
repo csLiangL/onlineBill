@@ -21,18 +21,19 @@
             }
         },
         mounted() {
-            console.log("mounted中初始化图表", this.xData);
             this.initChart();
-            console.log("mounted初始化图表后", this.xData);
+            this.updateChart();
         },
         methods: {
             // 初始化图表
             initChart() {
+                console.log("折线图初始化了")
                 this.lineInstance = this.$echarts.init(this.$refs.line)
             },
 
             // 更新图表
             updateChart() {
+                console.log("折线图更新了")
                 const option = {
                     grid: {
                         left: "18%",
@@ -62,7 +63,6 @@
 
         watch: {
             xData(newVal, oldVal) {
-                console.log("watch到xData改变了", "newVal", newVal, "oldVal", oldVal);
                 this.updateChart();
             },
             yData(newVal, oldVal) {

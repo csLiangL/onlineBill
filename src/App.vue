@@ -29,11 +29,13 @@
         isRouterAlive: true,
       }
     },
-    provide() {
-      return {
-        reload: this.reload
-      }
-    },
+
+    // provide() {
+    //   return {
+    //     reload: this.reload
+    //   }
+    // },
+
     created() {
       // 获得预算数据
       baseRequest({
@@ -47,10 +49,11 @@
         this.$store.commit("setBudget", { "budget": budget });
       })
     },
+
     methods: {
       reload() {
         this.isRouterAlive = false;
-        // 将回调延迟到下次DOM更新以后
+        // 将回调延迟到下次DOM更新以后, 回调的 this 自动绑定到调用它的实例上。
         this.$nextTick(() => {
           this.isRouterAlive = true;
         })

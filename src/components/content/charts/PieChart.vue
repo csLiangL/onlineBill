@@ -26,6 +26,7 @@
 
         mounted() {
             this.initChart();
+            this.updateChart();
         },
 
         methods: {

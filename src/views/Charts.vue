@@ -65,8 +65,8 @@
             return {
                 isMonth: true,
                 isOut: true,
-                time: new Date(),                               // 与vant组件绑定
-                year: "" + new Date().getFullYear() + "年",     // 记录当前年份
+                time: new Date(new Date().getFullYear() + "/" + (new Date().getMonth() + 1)),     // 年月，级联数据
+                year: "" + new Date().getFullYear() + "年",                                       // 年份，picker数据
                 isMonthPickShow: false,
                 isYearPickShow: false,
 
@@ -109,11 +109,12 @@
         methods: {
 
             async getData() {
-                console.log("开始请求数据");
+                // await 后面跟的函数存在异步且返回promise时, 才会阻塞之后的同步代码.
                 const { data: ret } = await baseRequest({
                     url: "/getOutIn",
                     params: { "userid": 1, "time": this.queryTime, "isMonth": this.isMonth }
                 })
+                console.log("开始请求数据");
                 this.ret = ret;
                 this.line_xData = ret.title;
                 this.setInOrOut(this.ret, this.isOut);
@@ -186,8 +187,8 @@
         watch: {
 
             // 以下数据改变后需要重新进行getData数据库操作
-            time() {
-                console.log("time");
+            time(newVal, oldVal) {
+                console.log("time", newVal, oldVal);
                 this.getData();
             },
             year() {
