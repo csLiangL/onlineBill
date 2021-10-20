@@ -12,12 +12,12 @@
 
         <div class="bar">
             <van-cell title="预算编辑" @click="show = true" :value="budgetShow" is-link class="bar-item">
-                <template slot="icon">
+                <template #icon>
                     <img src="~assets/img/budget.svg" alt="" class="image">
                 </template>
             </van-cell>
             <van-cell title="图表分析" is-link class="bar-item" url="/charts">
-                <template slot="icon">
+                <template #icon>
                     <img src="~assets/img/charts-active.svg" alt="" class="image">
                 </template>
             </van-cell>
@@ -86,7 +86,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     #profile {
         background-color: #f6f6f6;
     }
@@ -125,7 +125,7 @@
 
 
     .image {
-        width: 20px;
+        height: 20px;
         margin-right: 16px;
     }
 

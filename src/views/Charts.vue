@@ -65,8 +65,8 @@
             return {
                 isMonth: true,
                 isOut: true,
-                time: new Date(new Date().getFullYear() + "/" + (new Date().getMonth() + 1)),     // 年月，级联数据
-                year: "" + new Date().getFullYear() + "年",                                       // 年份，picker数据
+                time: new Date(),                               // 年月，级联数据
+                year: "" + new Date().getFullYear() + "年",     // 年份，picker数据
                 isMonthPickShow: false,
                 isYearPickShow: false,
 
